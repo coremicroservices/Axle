@@ -1,0 +1,108 @@
+﻿<div class="stepper-container">
+    <div class="stepper-item @(ViewBag.CurrentStep == 1 ? "active" : "")">
+        <div class="step-number">1</div>
+        <div class="step-label">Create Shipment</div>
+    </div>
+    <div class="stepper-line"></div>
+    <div class="stepper-item @(ViewBag.CurrentStep == 2 ? "active" : "")">
+        <div class="step-number">2</div>
+        <div class="step-label">Select Partner</div>
+    </div>
+    <div class="stepper-line"></div>
+    <div class="stepper-item @(ViewBag.CurrentStep == 3 ? "active" : "")">
+        <div class="step-number">3</div>
+        <div class="step-label">Make Payment</div>
+    </div>
+</div>
+
+<style>
+    /* Add this CSS to your site.css or a dedicated stepper.css file */
+    .stepper-container {
+        display: flex;
+        align-items: center;
+        justify-content: space-around; /* Distribute items evenly */
+        width: 100%;
+        margin-bottom: 30px;
+        padding: 20px 0;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .stepper-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        position: relative;
+        color: #6c757d; /* Default text color */
+    }
+
+    .step-number {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: #e9ecef; /* Default background */
+        color: #495057; /* Default number color */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-weight: bold;
+        margin-bottom: 8px;
+        border: 2px solid #e9ecef;
+        transition: all 0.3s ease;
+    }
+
+    .step-label {
+        font-size: 0.9em;
+        transition: color 0.3s ease;
+    }
+
+    /* Active state for stepper item */
+    .stepper-item.active .step-number {
+        background-color: #6f42c1; /* Purple background for active number */
+        color: #fff;
+        border-color: #6f42c1;
+    }
+
+    .stepper-item.active .step-label {
+        color: #6f42c1; /* Purple text for active label */
+        font-weight: bold;
+    }
+
+    .stepper-line {
+        flex-grow: 1; /* Make the line take available space */
+        height: 2px;
+        background-color: #e9ecef; /* Default line color */
+        margin: 0 15px; /* Spacing between items and lines */
+        transition: background-color 0.3s ease;
+    }
+
+    /* You might want to make lines active too if previous steps are complete */
+    .stepper-item.active + .stepper-line {
+        background-color: #6f42c1; /* Active line color */
+    }
+
+    /* Style for the "New Shipment" header, if you want it similar to the image */
+    .new-shipment-header {
+        display: flex;
+        align-items: center;
+        background-color: #6f42c1; /* Purple background */
+        color: #fff;
+        padding: 15px 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        font-size: 1.2em;
+        font-weight: bold;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+        .new-shipment-header span {
+            flex-grow: 1;
+        }
+
+        .new-shipment-header .arrow {
+            margin-left: 10px;
+            font-size: 1.5em; /* Larger arrow */
+        }
+</style>

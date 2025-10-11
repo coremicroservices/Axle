@@ -1,0 +1,5 @@
+﻿@Booking_HostAddress = 
+
+GET {{Booking_HostAddress}}/home/error/{id}
+
+###

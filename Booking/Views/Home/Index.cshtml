@@ -1,0 +1,186 @@
+﻿@model ShipmentViewModel
+@{
+    ViewData["Title"] = "Create Shipment";
+    var products = ViewBag.Products as List<(string Code, string Name)>;
+}
+
+
+
+<h2 class="mb-4">Create Shipment</h2>
+@Html.Partial("Stepper")
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+
+<div class="card shadow-sm p-4 mb-4">
+    <form asp-action="Create" asp-controller="Home" method="post" enctype="multipart/form-data" novalidate>
+        @Html.AntiForgeryToken()
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+        <!-- Invoice Upload -->
+        <div class="mb-4 p-3 border border-2 border-dashed rounded bg-light">
+            <h5 class="fw-semibold mb-2">Upload invoice to autofill shipment details</h5>
+            <p class="text-muted small mb-3">Drag & drop an image/PDF of your invoice or click to upload (max 10 MB).</p>
+            <input asp-for="InvoiceFile" type="file" class="form-control" />
+            <span asp-validation-for="InvoiceFile" class="text-danger"></span>
+        </div>
+
+        <!-- Serviceability -->
+        <div class="row g-3 mb-3">
+            <div class="col-md-6">
+                <label asp-for="SourcePincode" class="form-label"></label>
+                <input asp-for="SourcePincode" class="form-control" placeholder="Enter 6 digit pincode e.g. 421302" />
+                <span asp-validation-for="SourcePincode" class="text-danger"></span>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="DestinationPincode" class="form-label"></label>
+                <input asp-for="DestinationPincode" class="form-control" placeholder="Enter 6 digit pincode e.g. 421302" />
+                <span asp-validation-for="DestinationPincode" class="text-danger"></span>
+            </div>
+
+            <div class="col-md-6">
+                <label asp-for="SourceAddress" class="form-label"></label>
+                <textarea asp-for="SourceAddress" class="form-control" rows="2"></textarea>
+                <span asp-validation-for="SourceAddress" class="text-danger"></span>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="DestinationAddress" class="form-label"></label>
+                <textarea asp-for="DestinationAddress" class="form-control" rows="2"></textarea>
+                <span asp-validation-for="DestinationAddress" class="text-danger"></span>
+            </div>
+        </div>
+
+        <hr />
+
+        <!-- Invoice Details -->
+        <div class="mb-3">
+            <h5 class="fw-semibold mb-3">Invoice details</h5>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label asp-for="InvoiceNumber" class="form-label"></label>
+                    <input asp-for="InvoiceNumber" class="form-control" />
+                    <span asp-validation-for="InvoiceNumber" class="text-danger"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="InvoiceValue" class="form-label"></label>
+                    <input asp-for="InvoiceValue" class="form-control" />
+                    <span asp-validation-for="InvoiceValue" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+
+        <hr />
+
+        <!-- Shipment Details -->
+        <div class="mb-3">
+            <h5 class="fw-semibold mb-3">Shipment details</h5>
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label asp-for="ProductCode" class="form-label">Select Product</label>
+                    <select asp-for="ProductCode" class="form-select">
+                        <option value="">-- Select --</option>
+                        @foreach (var p in products)
+                        {
+                            <option value="@p.Code">@p.Name</option>
+                        }
+                    </select>
+                    <span asp-validation-for="ProductCode" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-2">
+                    <label asp-for="NumberOfBoxes" class="form-label"></label>
+                    <input asp-for="NumberOfBoxes" class="form-control" />
+                    <span asp-validation-for="NumberOfBoxes" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-2">
+                    <label asp-for="Length" class="form-label"></label>
+                    <input asp-for="Length" class="form-control" />
+                    <span asp-validation-for="Length" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-2">
+                    <label asp-for="Breadth" class="form-label"></label>
+                    <input asp-for="Breadth" class="form-control" />
+                    <span asp-validation-for="Breadth" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-2">
+                    <label asp-for="Height" class="form-label"></label>
+                    <input asp-for="Height" class="form-control" />
+                    <span asp-validation-for="Height" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-3 mt-3">
+                    <label asp-for="TotalWeight" class="form-label"></label>
+                    <input asp-for="TotalWeight" onchange="onTotalweight(3)" class="form-control" />
+                    <span asp-validation-for="TotalWeight" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+
+
+
+        @{
+            <div class="container mt-5">
+                <h4>Choose from Our Trusted Partners – Select According to Your Preference </h4>
+                <table class="table table-striped table-bordered">
+                    <thead>
+                        <tr>
+                            <th scope="col">Select</th>
+                            <th scope="col">Name</th>
+                            <th scope="col">Contact</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (ViewBag.Suppliers != null)
+                        {
+                            @foreach (var supplier in ViewBag.Suppliers)
+                            {
+                                <tr>
+                                    <td>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" value="" id="checkbox1">
+                                            <label class="form-check-label" for="@supplier.Id"></label>
+                                        </div>
+                                    </td>
+                                    <td>@supplier.SupplierName</td>
+                                    <td>@supplier.ContactNo</td>
+
+                                </tr>
+                            }
+
+
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+
+        <div class="mt-4 text-end">
+            <button type="submit" class="btn btn-primary px-4">Make Payments</button>
+        </div>
+
+    </form>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+}
+<script>
+
+        function onTotalweight(step) {
+        fetch('/Home/UpdateStep', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'               
+            },
+            body: JSON.stringify({ step: step })
+        });
+    }
+
+</script>
