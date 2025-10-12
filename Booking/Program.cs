@@ -1,5 +1,7 @@
+using Axle.Hubs;
 using Booking.Data;
 using Microsoft.EntityFrameworkCore;
+ 
 
 namespace Booking
 {
@@ -14,7 +16,17 @@ namespace Booking
             string connetionString = builder.Configuration.GetConnectionString("DefaultConnection");   
             builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connetionString)); 
             builder.Services.AddScoped<Services.IBookingService, Services.BookingService>();
-            builder.Services.AddScoped<Services.IUploadFileService, Services.UploadFileService>();  
+            builder.Services.AddScoped<Services.IUploadFileService, Services.UploadFileService>();
+            builder.Services.AddScoped<Services.IAuthService, Services.AuthService>();
+            builder.Services.AddScoped<Services.ISupplierService, Services.SupplierService>();
+            builder.Services.AddSignalR();
+            builder.Services.AddSession(options =>
+            {
+                options.IdleTimeout = TimeSpan.FromMinutes(30); // Session timeout
+                options.Cookie.HttpOnly = true;
+                options.Cookie.IsEssential = true;
+            });
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -30,11 +42,18 @@ namespace Booking
 
             app.UseRouting();
 
+            app.UseSession();
             app.UseAuthorization();
+
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapHub<ChatHub>("/notificationHub");
+                endpoints.MapHub<TrackingHub>("/trackinghub");
+            });
 
             app.MapControllerRoute(
                 name: "default",
-                pattern: "{controller=Home}/{action=Index}/{id?}");
+                pattern: "{controller=Welcome}/{action=Index}/{id?}");
 
             app.Run();
         }

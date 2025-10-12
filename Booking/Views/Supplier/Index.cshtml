@@ -1,0 +1,46 @@
+﻿@model SupplierLoginViewModel
+@{
+    ViewData["Title"] = "Supplier Login"; 
+    Layout = "~/Views/Shared/_SupplierLayout.cshtml";
+}
+<div class="container-fluid d-flex align-items-center bg-light">
+    <div class="row w-100">
+        <!-- Left Motivational Message -->
+        <div class="col-lg-6 d-flex flex-column justify-content-center px-5 mb-4 mb-lg-0">
+            <h2 class="fw-bold text-dark">"Every mile matters. Every load counts."</h2>
+            <p class="fs-5 text-muted mt-3">
+                Power India's logistics with your fleet. Join TruckBook and simplify your transport operations with real-time bookings, tracking, and payments.
+            </p>
+            <img src="~/images/truck-illustration.svg" alt="Truck Illustration" class="img-fluid mt-4 d-none d-md-block" />
+        </div>
+
+        <!-- Right Login Form -->
+        <div class="col-lg-6 d-flex justify-content-center align-items-center px-4">
+            <div class="card shadow-sm p-4 w-100" style="max-width: 400px;">
+                <h4 class="text-center text-dark mb-4">🔐 Supplier Login</h4>
+
+                <form asp-action="Login" asp-controller="Supplier" method="post">
+                    <div class="mb-3">
+                        <label asp-for="Contact" class="form-label">Email address</label>
+                        <input asp-for="Contact" class="form-control" placeholder="supplier@example.com" />
+                        <span asp-validation-for="Contact" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Password" class="form-label">Password</label>
+                        <input asp-for="Password" class="form-control" type="password" placeholder="••••••••" />
+                        <span asp-validation-for="Password" class="text-danger small"></span>
+                    </div>
+
+                    <div class="d-grid mb-3">
+                        <button type="submit" class="btn btn-dark">Login</button>
+                    </div>
+
+                    <div class="text-center">
+                        <a href="/Supplier/ForgotPassword" class="text-decoration-none">Forgot password?</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

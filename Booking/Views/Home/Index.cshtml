@@ -141,9 +141,15 @@
                                 <tr>
                                     <td>
                                         <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" value="" id="checkbox1">
-                                            <label class="form-check-label" for="@supplier.Id"></label>
+                                            <input class="form-check-input" type="checkbox"
+                                                   name="SelectedSupplierIds"
+                                                   value="@supplier.Id"
+                                                   id="supplier_@supplier.Id" />
+                                            <label class="form-check-label" for="supplier_@supplier.Id">
+                                                Select
+                                            </label>
                                         </div>
+
                                     </td>
                                     <td>@supplier.SupplierName</td>
                                     <td>@supplier.ContactNo</td>

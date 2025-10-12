@@ -17,5 +17,6 @@ namespace Booking.Data
         public virtual DbSet<ShipmentFile> ShipmentFiles { get; set; }
 
         public virtual DbSet<Suppliers> Suppliers { get; set; }
+        public virtual DbSet<UserModel> Users { get; set; } 
     }
 }

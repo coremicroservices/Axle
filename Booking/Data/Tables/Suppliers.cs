@@ -16,5 +16,13 @@ namespace Booking.Data.Tables
         [Required]
         [StringLength(15)]
         public string ContactNo { get; set; }
+
+        [Display(Name = "Created On")]
+        public DateTime? CreatedOn { get; set; }
+
+        [StringLength(100)]
+        [DataType(DataType.Password)]
+        public string Password { get; set; }
+
     }
 }

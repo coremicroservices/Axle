@@ -1,8 +1,12 @@
-using System.Diagnostics;
+using Axle.Hubs;
+using Booking.Data.Tables;
+using Booking.Helper;
 using Booking.Models;
 using Booking.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore.Metadata.Conventions;
+using System.Diagnostics;
 
 namespace Booking.Controllers
 {
@@ -10,6 +14,8 @@ namespace Booking.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly IBookingService _bookingService;
+        private readonly IHubContext<ChatHub> _hubContext;  
+
 
         private readonly List<(string Code, string Name)> _products = new()
         {
@@ -19,24 +25,31 @@ namespace Booking.Controllers
             ("BATT", "Batteries")
         };
 
-        public HomeController(ILogger<HomeController> logger, IBookingService bookingService)
+        public HomeController(ILogger<HomeController> logger, IBookingService bookingService, IHubContext<ChatHub> hubContext)
         {
             _logger = logger;
             _bookingService = bookingService;
+            _hubContext = hubContext;
         }
 
         public async Task<IActionResult> Index(CancellationToken cancellationToken = default)
         {
+            TempData[SessionKeys.User.LoggedInUserDetail] = SessionHelper.GetObjectFromSession<UserModel>(HttpContext.Session, SessionKeys.User.LoggedInUserDetail);
+
             ViewBag.CurrentStep = 3;
             ViewBag.Products = _products;
             ViewBag.Suppliers = await _bookingService.GetSuppliersAsync(cancellationToken);
+            if (TempData[SessionKeys.User.LoggedInUserDetail] is not null)
+            {
+                ViewBag.LoggedInUser = $"Welcome {(TempData[SessionKeys.User.LoggedInUserDetail] as UserModel).Name}";
+            }
             return View(new ShipmentViewModel());
             
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(ShipmentViewModel model)
+        public async Task<IActionResult> Create(ShipmentViewModel model, List<string> SelectedSupplierIds)
         {
             ViewBag.Products = _products;
 
@@ -46,9 +59,23 @@ namespace Booking.Controllers
                 return View(model);
             }
 
-            await _bookingService.CreateShipmentAsync(model);
+           string shipmetId =  await _bookingService.CreateShipmentAsync(model);
+            if(shipmetId is not null)
+            {
+                SelectedSupplierIds.ForEach(async supplierId =>
+                {                    
+                   await _hubContext.Clients.All.SendAsync(SessionKeys.User.SendNotificationToPartner, supplierId, "New shipment created.");
+                   // await _bookingService.LinkShipmentToSupplierAsync(model.ShipmentId, int.Parse(supplierId));
+                });
+            }
+            else
+            {
+                TempData["Error"] = "Error occurred while creating shipment (demo).";
+                return View(model);
+            }   
+          
 
-            TempData["Success"] = "Shipment created successfully (demo).";
+            TempData["Success"] = "Shipment created successfully.";
             return RedirectToAction(nameof(Index));
         }
 

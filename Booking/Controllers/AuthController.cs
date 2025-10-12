@@ -1,57 +1,69 @@
+using Booking.Data;
+using Booking.Data.Tables;
+using Booking.Helper;
+using Booking.Models;
+using Booking.Services;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 using System.Text;
-using TruckBookingApp.Api.Models;
+using System.Threading.Tasks;
 
 namespace TruckBookingApp.Api.Controllers;
-[ApiController]
-[Route("api/[controller]")]
-public class AuthController : ControllerBase
+ 
+public class AuthController : Controller
 {
-    private readonly UserManager<ApplicationUser> _userManager;
-    private readonly IConfiguration _config;
-
-    public AuthController(UserManager<ApplicationUser> userManager, IConfiguration config)
+    private readonly ILogger<AuthController> _logger;
+    private readonly IAuthService _authService;
+    public AuthController(IAuthService authService)
     {
-        _userManager = userManager;
-        _config = config;
+        _authService = authService  ;
+    }
+    public IActionResult Index()
+    {
+    
+        return View(new AuthViewModel());
     }
 
-    [HttpPost("register")]
-    public async Task<IActionResult> Register(RegisterDto dto)
+    [HttpPost]
+    public async Task<IActionResult> Login([Bind(Prefix = "login")] LoginViewModel login, CancellationToken cancellationToken)
     {
-        var user = new ApplicationUser { UserName = dto.Username, Email = dto.Email, FullName = dto.FullName, IsDriver = dto.IsDriver };
-        var res = await _userManager.CreateAsync(user, dto.Password);
-        if (!res.Succeeded) return BadRequest(res.Errors);
-        return Ok(new { user.Id, user.UserName });
-    }
-
-    [HttpPost("login")]
-    public async Task<IActionResult> Login(LoginDto dto)
-    {
-        var user = await _userManager.FindByNameAsync(dto.Username);
-        if (user == null) return Unauthorized();
-        var valid = await _userManager.CheckPasswordAsync(user, dto.Password);
-        if (!valid) return Unauthorized();
-
-        var tokenHandler = new JwtSecurityTokenHandler();
-        var key = Encoding.ASCII.GetBytes(_config["Jwt:Key"] ?? "dev_key_change_this_in_prod");
-        var tokenDescriptor = new SecurityTokenDescriptor
+        if (ModelState.IsValid)
         {
-            Subject = new ClaimsIdentity(new[] {
-                new Claim(ClaimTypes.NameIdentifier, user.Id),
-                new Claim(ClaimTypes.Name, user.UserName)
-            }),
-            Expires = DateTime.UtcNow.AddDays(7),
-            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-        };
-        var token = tokenHandler.CreateToken(tokenDescriptor);
-        return Ok(new { token = tokenHandler.WriteToken(token) });
+            var result = await _authService.LoginUserAsync(login.Email, login.Password, cancellationToken);
+            if (result != null)
+            {
+                HttpContext.Session.Set(SessionKeys.User.LoggedInUserDetail, Encoding.GetEncoding("utf-8").GetBytes(System.Text.Json.JsonSerializer.Serialize(result)));
+                 
+                return RedirectToAction("Index", "Home");
+            }
+            return RedirectToAction("Index", "Auth");
+        }
+        return RedirectToAction("Index", "Auth");
     }
-}
+ 
 
-public record RegisterDto(string Username, string Email, string Password, string FullName, bool IsDriver);
-public record LoginDto(string Username, string Password);
+    [HttpPost]
+    public async Task<IActionResult> Register([Bind(Prefix = "Register")] RegisterViewModel register)
+    {
+        if (ModelState.IsValid)
+        {
+         var result =  await  _authService.RegisterUserAsync(new UserModel
+            {
+                Name = register.Name,
+                Email = register.Email,
+                PasswordHash = register.Password,
+                Id = GuideHelper.GetGuide(),
+                CreatedAt = DateTime.UtcNow
+            });
+            // Success: register contains valid data
+            TempData["register"] = $"Registration successfully Done.. with uniqe Id {result}";
+            return RedirectToAction("Index", "Auth");
+        }
+
+        // Rehydrate wrapper model for redisplay
+        var model = new AuthViewModel { Register = register };
+        return View("LoginRegister", model);
+    }
+
+}
