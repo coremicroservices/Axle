@@ -2,13 +2,14 @@
 using Booking.Data.Tables;
 using Booking.Helper;
 using Booking.Models;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
 
 namespace Booking.Services
 {
     public interface IBookingService
     {
-        public Task<string> CreateShipmentAsync(ShipmentViewModel shipmentViewModel, CancellationToken cancellationToken = default);
+        public Task<string> CreateShipmentAsync(ShipmentViewModel shipmentViewModel, List<string> supplierIds, CancellationToken cancellationToken = default);
 
         public Task<List<Suppliers>> GetSuppliersAsync(CancellationToken cancellationToken = default);
     }
@@ -25,7 +26,7 @@ namespace Booking.Services
             _dbContext = dbContext;
             _uploadFileService = uploadFileService;
         }
-        public async Task<string> CreateShipmentAsync(ShipmentViewModel shipmentViewModel, CancellationToken cancellationToken = default)
+        public async Task<string> CreateShipmentAsync(ShipmentViewModel shipmentViewModel,List<string> supplierIds, CancellationToken cancellationToken = default)
         {
             var uploadedFileDetail = await _uploadFileService.UploadFileAsync(shipmentViewModel.InvoiceFile);
             Shipment shipment = new Shipment
@@ -56,8 +57,23 @@ namespace Booking.Services
                 ProductCode = shipmentViewModel.ProductCode,
                 TotalWeight = shipmentViewModel.TotalWeight,
 
+            
             };
 
+            foreach (var supplierId in supplierIds)
+            {
+                var buyerSupplier = new BuyerSupplierMapping()
+                {
+                    ShipmentId = shipment.Id,
+                    SupplierId = supplierId,
+                    CreatedOn = DateTime.UtcNow,
+                };
+
+                await _dbContext.AddAsync(buyerSupplier, cancellationToken);
+
+            }
+
+           
             await _dbContext.AddAsync(shipmentDetail);
             await _dbContext.AddAsync(shipment);
             await _dbContext.SaveChangesAsync(cancellationToken);

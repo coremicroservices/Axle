@@ -3,7 +3,9 @@
     ViewData["Title"] = "Supplier Dashboard";
     Layout = "~/Views/Shared/_SupplierLayout.cshtml";
 }
- 
+<script>
+
+</script>
 
 <div class="text-center my-4">
     <h2 class="fw-bold">Welcome back, @ViewBag.supplierName !</h2>
@@ -11,6 +13,15 @@
 </div>
 
 <div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-body text-center">
+                <h5 class="card-title">Incoming Bookings</h5>
+                <h2 class="text-primary">@ViewBag.IncomingBookingCount</h2>
+                <p class="text-muted">Ongoing deliveries</p>
+            </div>
+        </div>
+    </div>
     <div class="col-md-4">
         <div class="card shadow-sm border-0">
             <div class="card-body text-center">

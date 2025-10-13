@@ -1,5 +1,8 @@
 using Axle.Hubs;
 using Booking.Data;
+using Booking.Hubs;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
  
 
@@ -20,12 +23,22 @@ namespace Booking
             builder.Services.AddScoped<Services.IAuthService, Services.AuthService>();
             builder.Services.AddScoped<Services.ISupplierService, Services.SupplierService>();
             builder.Services.AddSignalR();
+            builder.Services.AddSingleton<IUserIdProvider, CustomUserIdProvider>();
+
             builder.Services.AddSession(options =>
             {
                 options.IdleTimeout = TimeSpan.FromMinutes(30); // Session timeout
                 options.Cookie.HttpOnly = true;
                 options.Cookie.IsEssential = true;
             });
+
+            builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/Supplier/Login";
+        options.AccessDeniedPath = "/Supplier/AccessDenied";
+    });
+
 
             var app = builder.Build();
 
@@ -43,6 +56,7 @@ namespace Booking
             app.UseRouting();
 
             app.UseSession();
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

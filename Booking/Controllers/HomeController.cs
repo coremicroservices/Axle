@@ -1,6 +1,7 @@
 using Axle.Hubs;
 using Booking.Data.Tables;
 using Booking.Helper;
+using Booking.Hubs;
 using Booking.Models;
 using Booking.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -59,12 +60,20 @@ namespace Booking.Controllers
                 return View(model);
             }
 
-           string shipmetId =  await _bookingService.CreateShipmentAsync(model);
+            string shipmetId =  await _bookingService.CreateShipmentAsync(model, SelectedSupplierIds);
             if(shipmetId is not null)
             {
                 SelectedSupplierIds.ForEach(async supplierId =>
-                {                    
-                   await _hubContext.Clients.All.SendAsync(SessionKeys.User.SendNotificationToPartner, supplierId, "New shipment created.");
+                {
+                    var bookingRequest = new BookingRequest()
+                    {
+                        CustomerName = "Sharad",
+                        Drop = "Mumbai",
+                        Pickup = "Pune",
+                        ScheduledTime = DateTime.UtcNow.ToString(),
+                        TruckType = "4L"
+                    };
+                   await _hubContext.Clients.User(supplierId).SendAsync(SessionKeys.User.SendNotificationToPartner, bookingRequest);
                    // await _bookingService.LinkShipmentToSupplierAsync(model.ShipmentId, int.Parse(supplierId));
                 });
             }

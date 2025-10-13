@@ -18,5 +18,6 @@ namespace Booking.Data
 
         public virtual DbSet<Suppliers> Suppliers { get; set; }
         public virtual DbSet<UserModel> Users { get; set; } 
-    }
+        public virtual DbSet<BuyerSupplierMapping> BuyerSupplierMappings { get; set; }
+        }
 }
