@@ -1,13 +1,16 @@
 using Axle.Hubs;
 using Booking.Data.Tables;
+using Booking.FCMNotification;
 using Booking.Helper;
 using Booking.Hubs;
 using Booking.Models;
 using Booking.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
-using Microsoft.EntityFrameworkCore.Metadata.Conventions;
+using System.Collections.Concurrent;
 using System.Diagnostics;
+using System.Threading;
+using static Booking.Helper.SessionKeys;
 
 namespace Booking.Controllers
 {
@@ -15,8 +18,9 @@ namespace Booking.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly IBookingService _bookingService;
-        private readonly IHubContext<ChatHub> _hubContext;  
-
+        private readonly IHubContext<ChatHub> _hubContext;
+        private readonly IFCMNotification _FCMNotification;
+        private readonly ConcurrentDictionary<string, string> keyValuePairs = [];
 
         private readonly List<(string Code, string Name)> _products = new()
         {
@@ -26,23 +30,30 @@ namespace Booking.Controllers
             ("BATT", "Batteries")
         };
 
-        public HomeController(ILogger<HomeController> logger, IBookingService bookingService, IHubContext<ChatHub> hubContext)
+        public HomeController(ILogger<HomeController> logger, IBookingService bookingService, IHubContext<ChatHub> hubContext, IFCMNotification FCMNotification)
         {
             _logger = logger;
             _bookingService = bookingService;
             _hubContext = hubContext;
+            _FCMNotification = FCMNotification;
         }
 
         public async Task<IActionResult> Index(CancellationToken cancellationToken = default)
         {
-            TempData[SessionKeys.User.LoggedInUserDetail] = SessionHelper.GetObjectFromSession<UserModel>(HttpContext.Session, SessionKeys.User.LoggedInUserDetail);
+            TempData[SessionKeys.User.LoggedInUserDetail] = SessionHelper.GetObjectFromSession<UserDto>(HttpContext.Session, SessionKeys.User.LoggedInUserDetail);
 
+            var suppliers = await _bookingService.GetSuppliersAsync(cancellationToken);
             ViewBag.CurrentStep = 3;
             ViewBag.Products = _products;
-            ViewBag.Suppliers = await _bookingService.GetSuppliersAsync(cancellationToken);
+            ViewBag.Suppliers = suppliers;
+            suppliers.ForEach(x =>
+            {
+                if (x.FcmDeviceToken?.DeviceToken is not null)
+                    keyValuePairs.AddOrUpdate(x.Id, x.FcmDeviceToken.DeviceToken, (key, oldValue) => x.FcmDeviceToken.DeviceToken);
+            });
             if (TempData[SessionKeys.User.LoggedInUserDetail] is not null)
             {
-                ViewBag.LoggedInUser = $"Welcome {(TempData[SessionKeys.User.LoggedInUserDetail] as UserModel).Name}";
+                ViewBag.LoggedInUser = $"Welcome {(TempData[SessionKeys.User.LoggedInUserDetail] as UserDto).Name}";
             }
             return View(new ShipmentViewModel());
             
@@ -60,9 +71,15 @@ namespace Booking.Controllers
                 return View(model);
             }
 
-            string shipmetId =  await _bookingService.CreateShipmentAsync(model, SelectedSupplierIds);
+            string shipmetId =  await _bookingService.CreateShipmentAsync(model, SelectedSupplierIds  );
             if(shipmetId is not null)
             {
+                var suppliers = await _bookingService.GetSuppliersAsync();
+                suppliers.ForEach(x =>
+                {
+                    if (x.FcmDeviceToken?.DeviceToken is not null)
+                        keyValuePairs.AddOrUpdate(x.Id, x.FcmDeviceToken.DeviceToken, (key, oldValue) => x.FcmDeviceToken.DeviceToken);
+                });
                 SelectedSupplierIds.ForEach(async supplierId =>
                 {
                     var bookingRequest = new BookingRequest()
@@ -73,19 +90,23 @@ namespace Booking.Controllers
                         ScheduledTime = DateTime.UtcNow.ToString(),
                         TruckType = "4L"
                     };
-                   await _hubContext.Clients.User(supplierId).SendAsync(SessionKeys.User.SendNotificationToPartner, bookingRequest);
-                   // await _bookingService.LinkShipmentToSupplierAsync(model.ShipmentId, int.Parse(supplierId));
+                    await _hubContext.Clients.User(supplierId).SendAsync(SessionKeys.User.SendNotificationToPartner, bookingRequest);
+                    // await _bookingService.LinkShipmentToSupplierAsync(model.ShipmentId, int.Parse(supplierId));
+                    if (keyValuePairs.ContainsKey(supplierId))
+                        await _FCMNotification.SendPushNotification(keyValuePairs[supplierId], "New Shipment Created", $"A new shipment with ID {shipmetId} has been created.");
                 });
             }
             else
             {
                 TempData["Error"] = "Error occurred while creating shipment (demo).";
                 return View(model);
-            }   
-          
+            }
 
-            TempData["Success"] = "Shipment created successfully.";
-            return RedirectToAction(nameof(Index));
+      
+
+            TempData["success"] = "Shipment created successfully.";
+            return RedirectToAction("MyBookings", "Customer");
+            //Customer/MyBookings
         }
 
         public IActionResult Privacy()

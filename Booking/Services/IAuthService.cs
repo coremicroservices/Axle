@@ -7,7 +7,7 @@ namespace Booking.Services
     public interface IAuthService
     {
         public Task<string> RegisterUserAsync(UserModel userModel,CancellationToken cancellationToken = default);
-        public Task<UserModel> LoginUserAsync(string userName,string password, CancellationToken cancellationToken = default);
+        public Task<UserDto> LoginUserAsync(string userName,string password, CancellationToken cancellationToken = default);
     }
     public class AuthService : IAuthService
     {
@@ -16,15 +16,16 @@ namespace Booking.Services
         {
             _applicationDbContext = applicationDbContext;   
         }
-        public async Task<UserModel> LoginUserAsync(string userName, string password, CancellationToken cancellationToken = default)
+        public async Task<UserDto> LoginUserAsync(string userName, string password, CancellationToken cancellationToken = default)
         {
-            var userModel =  await _applicationDbContext.Users.AsNoTrackingWithIdentityResolution().FirstOrDefaultAsync(u=>u.Email == userName && u.PasswordHash == password, cancellationToken);
-            return userModel is not null ? new UserModel()
+            var userModel = await _applicationDbContext.Users.Include(x => x.FcmDeviceToken).AsNoTrackingWithIdentityResolution().FirstOrDefaultAsync(u => u.Email == userName && u.PasswordHash == password, cancellationToken);
+            return userModel is not null ? new UserDto()
             {
-                Name = userModel!.Name,
                 CreatedAt = userModel.CreatedAt,
-                Email = userModel.Email
-
+                DeviceToken = userModel.FcmDeviceToken != null ? userModel.FcmDeviceToken.DeviceToken : string.Empty,
+                Email = userModel.Email,
+                Id = userModel.Id,
+                Name = userModel.Name
             } : null;
         }
 

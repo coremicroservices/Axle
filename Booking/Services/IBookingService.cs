@@ -85,7 +85,7 @@ namespace Booking.Services
 
         public async Task<List<Suppliers>> GetSuppliersAsync(CancellationToken cancellationToken = default)
         {
-            return await _dbContext.Suppliers.ToListAsync(cancellationToken);
+            return await _dbContext.Suppliers.Include(x =>  x.FcmDeviceToken).ToListAsync(cancellationToken);
         }
     }
 }

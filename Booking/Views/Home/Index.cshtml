@@ -8,11 +8,7 @@
 
 <h2 class="mb-4">Create Shipment</h2>
 @Html.Partial("Stepper")
-@if (TempData["Success"] != null)
-{
-    <div class="alert alert-success">@TempData["Success"]</div>
-}
-
+ 
 <div class="card shadow-sm p-4 mb-4">
     <form asp-action="Create" asp-controller="Home" method="post" enctype="multipart/form-data" novalidate>
         @Html.AntiForgeryToken()
@@ -151,8 +147,8 @@
                                         </div>
 
                                     </td>
-                                    <td>@supplier.SupplierName</td>
-                                    <td>@supplier.ContactNo</td>
+                                    <td>@supplier.CompanyName</td>
+                                     
 
                                 </tr>
                             }

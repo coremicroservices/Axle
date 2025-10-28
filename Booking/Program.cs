@@ -1,5 +1,6 @@
 using Axle.Hubs;
 using Booking.Data;
+using Booking.Data.Tables;
 using Booking.Hubs;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.SignalR;
@@ -24,6 +25,7 @@ namespace Booking
             builder.Services.AddScoped<Services.ISupplierService, Services.SupplierService>();
             builder.Services.AddSignalR();
             builder.Services.AddSingleton<IUserIdProvider, CustomUserIdProvider>();
+            builder.Services.AddScoped<FCMNotification.IFCMNotification, FCMNotification.FCMNotification>();
 
             builder.Services.AddSession(options =>
             {
