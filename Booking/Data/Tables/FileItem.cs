@@ -32,7 +32,8 @@ namespace Booking.Data.Tables
         [Required]
         public string Owner { get; set; }
 
-        
+        public string FolderPath { get; set; }
+        public string NodeId { get; set; }
 
         public virtual ShipmentFile ShipmentFile { get; set; }  
 

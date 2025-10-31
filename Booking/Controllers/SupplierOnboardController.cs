@@ -10,9 +10,9 @@ namespace Booking.Controllers
     public class SupplierOnboardController : Controller
     {
         private readonly ApplicationDbContext _applicationDbContext;
-        private readonly IUploadFileService _uploadFileService;
+        private readonly IFileService _uploadFileService;
 
-        public SupplierOnboardController(ApplicationDbContext applicationDbContext, IUploadFileService uploadFileService)
+        public SupplierOnboardController(ApplicationDbContext applicationDbContext, IFileService uploadFileService)
         {
             _applicationDbContext = applicationDbContext;
             _uploadFileService = uploadFileService;
