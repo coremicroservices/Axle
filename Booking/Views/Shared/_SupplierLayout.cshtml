@@ -29,21 +29,21 @@
     console.error("SignalR connection error:", err.toString());
     });
 
-    function showBookingPopup(data) {
-    document.getElementById("popupCustomerName").textContent = data.customerName;
-    document.getElementById("popupPickupLocation").textContent = data.pickup;
-    document.getElementById("popupDropLocation").textContent = data.drop;
-    document.getElementById("popupTruckType").textContent = data.truckType;
-    document.getElementById("popupScheduledTime").textContent = data.scheduledTime;
+            function showBookingPopup(data) {
+            document.getElementById("popupCustomerName").textContent = data.customerName;
+                document.getElementById("popupPickupLocation").textContent = data.pickupLocation;
+                document.getElementById("popupDropLocation").textContent = data.dropLocation;
+            document.getElementById("popupTruckType").textContent = data.truckType;
+            document.getElementById("popupScheduledTime").textContent = data.scheduledTime;
 
-    const popup = new bootstrap.Modal(document.getElementById("bookingRequestPopup"));
-    popup.show();
-    }
+            const popup = new bootstrap.Modal(document.getElementById("bookingRequestPopup"));
+            popup.show();
+            }
 
-    function acceptBooking() {
-    // Send accept signal via SignalR or AJAX
-    console.log("Booking accepted");
-    }
+        function acceptBooking() {
+        // Send accept signal via SignalR or AJAX
+        console.log("Booking accepted");
+        }
 
     function rejectBooking() {
     // Send reject signal via SignalR or AJAX
@@ -98,11 +98,18 @@
                 </div>
 
                 <div class="modal-body">
+                    <input type="hidden" id="popupBookingId" />
                     <p><strong>Customer:</strong> <span id="popupCustomerName"></span></p>
                     <p><strong>Pickup:</strong> <span id="popupPickupLocation"></span></p>
                     <p><strong>Drop:</strong> <span id="popupDropLocation"></span></p>
                     <p><strong>Truck Type:</strong> <span id="popupTruckType"></span></p>
                     <p><strong>Scheduled Time:</strong> <span id="popupScheduledTime"></span></p>
+                    <p>
+                        <strong>Charges:</strong>
+                        <div class="input-group mb-3">
+                            <input type="text" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default">
+                        </div>
+                    </p>
                 </div>
 
                 <div class="modal-footer">
