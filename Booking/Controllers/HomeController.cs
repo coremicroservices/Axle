@@ -71,6 +71,8 @@ namespace Booking.Controllers
                 return View(model);
             }
 
+           var UserDto = SessionHelper.GetObjectFromSession<UserDto>(HttpContext.Session, SessionKeys.User.LoggedInUserDetail);
+
             string shipmetId =  await _bookingService.CreateShipmentAsync(model, SelectedSupplierIds  );
             if(shipmetId is not null)
             {
@@ -84,11 +86,12 @@ namespace Booking.Controllers
                 {
                     var bookingRequest = new BookingRequest()
                     {
+                        BookingId = shipmetId,
                         CustomerName = "Sharad",
-                        Drop = "Mumbai",
-                        Pickup = "Pune",
-                        ScheduledTime = DateTime.UtcNow.ToString(),
-                        TruckType = "4L"
+                        DropLocation = $"{model.DestinationAddress} . Pin Code({model.DestinationPincode}) ",
+                        PickupLocation = $"{model.SourceAddress} . Pin Code({model.SourcePincode}) ",
+                        ScheduledTime = DateTime.UtcNow.AddDays(10),
+                        TruckType = _products.First(x=>x.Code.Equals(model.ProductCode)).Name ?? string.Empty
                     };
                     await _hubContext.Clients.User(supplierId).SendAsync(SessionKeys.User.SendNotificationToPartner, bookingRequest);
                     // await _bookingService.LinkShipmentToSupplierAsync(model.ShipmentId, int.Parse(supplierId));

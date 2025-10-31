@@ -2,11 +2,12 @@
 {
     public class BookingRequest
     {
+        public string BookingId { get; set; }
         public string CustomerName { get; set; }
-        public string Pickup { get; set; }
-        public string Drop { get; set; }
+        public string PickupLocation { get; set; }
+        public string DropLocation { get; set; }
         public string TruckType { get; set; }
-        public string ScheduledTime { get; set; }
-
+        public DateTime? ScheduledTime { get; set; }
+        public decimal? Charges { get; set; }
     }
 }
