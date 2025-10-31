@@ -18,7 +18,7 @@ namespace Booking.Services
         }
         public async Task<UserDto> LoginUserAsync(string userName, string password, CancellationToken cancellationToken = default)
         {
-            var userModel = await _applicationDbContext.Users.Include(x => x.FcmDeviceToken).AsNoTrackingWithIdentityResolution().FirstOrDefaultAsync(u => u.Email == userName && u.PasswordHash == password, cancellationToken);
+            var userModel = await _applicationDbContext.Users.AsNoTrackingWithIdentityResolution().FirstOrDefaultAsync(u => u.Email == userName && u.PasswordHash == password, cancellationToken);
             return userModel is not null ? new UserDto()
             {
                 CreatedAt = userModel.CreatedAt,

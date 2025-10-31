@@ -44,6 +44,7 @@ namespace Booking.Services
                 shipmentViewModel.SourceAddress,
                 SourcePincode = shipmentViewModel.SourcePincode,
                 UpdatedOn = DateTime.UtcNow,
+                BookingDate = shipmentViewModel.BookingDate,
 
             };
             ShipmentDetail shipmentDetail = new ShipmentDetail

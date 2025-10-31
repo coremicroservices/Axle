@@ -9,5 +9,6 @@
         public string TruckType { get; set; }
         public DateTime? ScheduledTime { get; set; }
         public decimal? Charges { get; set; }
+
     }
 }

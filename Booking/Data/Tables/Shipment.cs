@@ -51,5 +51,6 @@ namespace Booking.Data.Tables
         public DateTime? UpdatedOn { get; set; }
 
         public bool IsActive { get; set; } = true;
+        public DateTime BookingDate { get; set; }
     }
 }

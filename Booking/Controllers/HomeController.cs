@@ -9,8 +9,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using System.Collections.Concurrent;
 using System.Diagnostics;
-using System.Threading;
-using static Booking.Helper.SessionKeys;
 
 namespace Booking.Controllers
 {
@@ -90,7 +88,7 @@ namespace Booking.Controllers
                         CustomerName = "Sharad",
                         DropLocation = $"{model.DestinationAddress} . Pin Code({model.DestinationPincode}) ",
                         PickupLocation = $"{model.SourceAddress} . Pin Code({model.SourcePincode}) ",
-                        ScheduledTime = DateTime.UtcNow.AddDays(10),
+                        ScheduledTime = model.BookingDate,
                         TruckType = _products.First(x=>x.Code.Equals(model.ProductCode)).Name ?? string.Empty
                     };
                     await _hubContext.Clients.User(supplierId).SendAsync(SessionKeys.User.SendNotificationToPartner, bookingRequest);
