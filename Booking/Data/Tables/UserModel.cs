@@ -1,4 +1,5 @@
-﻿using Booking.Helper;
+﻿using Booking.FCMNotification;
+using Booking.Helper;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -25,5 +26,17 @@ namespace Booking.Data.Tables
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
+       public virtual FcmDeviceToken? FcmDeviceToken { get; set; } 
+
+        public string FcmDeviceTokenId { get; set; }
+    }
+
+    public class UserDto
+    {
+        public string Id { get; set; }
+        public string Name { get; set; }
+        public string Email { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public string DeviceToken { get; set; }
     }
 }

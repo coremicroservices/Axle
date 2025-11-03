@@ -10,7 +10,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link href="~/css/site.css" rel="stylesheet" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js" integrity="sha512-VEd+nq25CkR676O+pLBnDW09R7VQX9Mdiij052gVCp5yVH3jGtH70Ho/UUv4mJDsEdTvqRCFZg0NKGiojGnUCw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
 
     <script type = "text/javascript" >
     const connection = new signalR.HubConnectionBuilder()
@@ -28,27 +29,60 @@
     console.error("SignalR connection error:", err.toString());
     });
 
-    function showBookingPopup(data) {
-    document.getElementById("popupCustomerName").textContent = data.customerName;
-    document.getElementById("popupPickupLocation").textContent = data.pickup;
-    document.getElementById("popupDropLocation").textContent = data.drop;
-    document.getElementById("popupTruckType").textContent = data.truckType;
-    document.getElementById("popupScheduledTime").textContent = data.scheduledTime;
+            function showBookingPopup(data) {
+            document.getElementById("popupCustomerName").textContent = data.customerName;
+                document.getElementById("popupPickupLocation").textContent = data.pickupLocation;
+                document.getElementById("popupDropLocation").textContent = data.dropLocation;
+            document.getElementById("popupTruckType").textContent = data.truckType;
+            document.getElementById("popupScheduledTime").textContent = data.scheduledTime;
 
-    const popup = new bootstrap.Modal(document.getElementById("bookingRequestPopup"));
-    popup.show();
-    }
+            const popup = new bootstrap.Modal(document.getElementById("bookingRequestPopup"));
+            popup.show();
+            }
 
-    function acceptBooking() {
-    // Send accept signal via SignalR or AJAX
-    console.log("Booking accepted");
-    }
+        function acceptBooking() {
+        // Send accept signal via SignalR or AJAX
+        console.log("Booking accepted");
+        }
 
     function rejectBooking() {
     // Send reject signal via SignalR or AJAX
     console.log("Booking rejected");
     }
 
+    </script>
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-analytics.js";
+        // TODO: Add SDKs for Firebase products that you want to use
+        // https://firebase.google.com/docs/web/setup#available-libraries
+
+        // Your web app's Firebase configuration
+        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+        const firebaseConfig = {
+          apiKey: "AIzaSyCJr1oEQS_ttEOh3VTlH1fcz_SKPuLZa-4",
+          authDomain: "axle-notification.firebaseapp.com",
+          projectId: "axle-notification",
+          storageBucket: "axle-notification.firebasestorage.app",
+          messagingSenderId: "916146303029",
+          appId: "1:916146303029:web:c1419dd62db3cb6628017c",
+          measurementId: "G-QZET1C7S0L"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+    </script>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-QZET1C7S0L"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'G-QZET1C7S0L');
     </script>
 </head>
 <body>
@@ -64,11 +98,18 @@
                 </div>
 
                 <div class="modal-body">
+                    <input type="hidden" id="popupBookingId" />
                     <p><strong>Customer:</strong> <span id="popupCustomerName"></span></p>
                     <p><strong>Pickup:</strong> <span id="popupPickupLocation"></span></p>
                     <p><strong>Drop:</strong> <span id="popupDropLocation"></span></p>
                     <p><strong>Truck Type:</strong> <span id="popupTruckType"></span></p>
                     <p><strong>Scheduled Time:</strong> <span id="popupScheduledTime"></span></p>
+                    <p>
+                        <strong>Charges:</strong>
+                        <div class="input-group mb-3">
+                            <input type="text" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default">
+                        </div>
+                    </p>
                 </div>
 
                 <div class="modal-footer">
@@ -78,7 +119,26 @@
             </div>
         </div>
     </div>
+    @if (TempData["error"] is not null)
+    {
+        <script src="~/lib/jquery/dist/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js" integrity="sha512-VEd+nq25CkR676O+pLBnDW09R7VQX9Mdiij052gVCp5yVH3jGtH70Ho/UUv4mJDsEdTvqRCFZg0NKGiojGnUCw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
+        <script type="text/javascript">
+            toastr.error('@TempData["error"]');
+        </script>
+    }
+
+
+    @if (TempData["success"] is not null)
+    {
+        <script src="~/lib/jquery/dist/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js" integrity="sha512-VEd+nq25CkR676O+pLBnDW09R7VQX9Mdiij052gVCp5yVH3jGtH70Ho/UUv4mJDsEdTvqRCFZg0NKGiojGnUCw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+        <script type="text/javascript">
+            toastr.success('@TempData["success"]');
+        </script>
+    }
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark px-3">
         <a class="navbar-brand" href="#">TruckBook</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#topNav">

@@ -1,5 +1,14 @@
-﻿@Booking_HostAddress = 
+﻿@Booking_HostAddress = https://localhost:44388
 
 GET {{Booking_HostAddress}}/home/error/{id}
+
+###
+
+@nodeId="3SpmyJqbs"
+GET {{Booking_HostAddress}}/api/imageapi/3SpmyJqbs
+
+###
+
+GET {{Booking_HostAddress}}/api/imageapi/{{nodeId}}
 
 ###

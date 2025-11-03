@@ -1,5 +1,6 @@
 using Axle.Hubs;
 using Booking.Data;
+using Booking.Data.Tables;
 using Booking.Hubs;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.SignalR;
@@ -19,11 +20,16 @@ namespace Booking
             string connetionString = builder.Configuration.GetConnectionString("DefaultConnection");   
             builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connetionString)); 
             builder.Services.AddScoped<Services.IBookingService, Services.BookingService>();
-            builder.Services.AddScoped<Services.IUploadFileService, Services.UploadFileService>();
+            builder.Services.AddScoped<Services.IFileService, Services.FileService>();
             builder.Services.AddScoped<Services.IAuthService, Services.AuthService>();
             builder.Services.AddScoped<Services.ISupplierService, Services.SupplierService>();
             builder.Services.AddSignalR();
             builder.Services.AddSingleton<IUserIdProvider, CustomUserIdProvider>();
+            builder.Services.AddScoped<FCMNotification.IFCMNotification, FCMNotification.FCMNotification>();
+            builder.Services.AddMemoryCache(x =>
+            {
+                x.SizeLimit = 1024 * 1024 * 10; // 10 MB
+            });
 
             builder.Services.AddSession(options =>
             {

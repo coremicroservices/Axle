@@ -1,4 +1,6 @@
 ﻿using Booking.Helper;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -39,6 +41,18 @@ namespace Booking.Data.Tables
         public DateTime UploadedOn { get; set; } = DateTime.UtcNow;
 
         public bool IsActive { get; set; } = true;
- 
+
+        public string fileItemId { get; set; }
+
+        public virtual FileItem FileItem { get; set; }
     }
+    public class ShipmentFileConfiguration : IEntityTypeConfiguration<ShipmentFile>
+    {
+        public void Configure(EntityTypeBuilder<ShipmentFile> builder)
+        {
+            builder.HasOne(s => s.FileItem)
+                   .WithOne(f => f.ShipmentFile)
+                   .HasForeignKey<ShipmentFile>(s => s.FileId);
+        }
+    }   
 }

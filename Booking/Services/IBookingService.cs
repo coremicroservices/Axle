@@ -18,9 +18,9 @@ namespace Booking.Services
     {
         private readonly ILogger<BookingService> _logger;
         private readonly ApplicationDbContext _dbContext;
-        private readonly IUploadFileService _uploadFileService;
+        private readonly IFileService _uploadFileService;
 
-        public BookingService(ILogger<BookingService> logger, ApplicationDbContext dbContext, IUploadFileService uploadFileService)
+        public BookingService(ILogger<BookingService> logger, ApplicationDbContext dbContext, IFileService uploadFileService)
         {
             _logger = logger;
             _dbContext = dbContext;
@@ -44,6 +44,7 @@ namespace Booking.Services
                 shipmentViewModel.SourceAddress,
                 SourcePincode = shipmentViewModel.SourcePincode,
                 UpdatedOn = DateTime.UtcNow,
+                BookingDate = shipmentViewModel.BookingDate,
 
             };
             ShipmentDetail shipmentDetail = new ShipmentDetail
@@ -85,7 +86,7 @@ namespace Booking.Services
 
         public async Task<List<Suppliers>> GetSuppliersAsync(CancellationToken cancellationToken = default)
         {
-            return await _dbContext.Suppliers.ToListAsync(cancellationToken);
+            return await _dbContext.Suppliers.Include(x =>  x.FcmDeviceToken).ToListAsync(cancellationToken);
         }
     }
 }

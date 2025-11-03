@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Booking.Helper;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Booking.Data.Tables
@@ -7,22 +8,39 @@ namespace Booking.Data.Tables
     public class Suppliers
     {
         [Key]
-        public string Id { get; set; }
-
         [Required]
-        [StringLength(100)]
-        public string SupplierName { get; set; }
+        [Column("SupplierId")]
+        public string Id { get; set; } = GuideHelper.GetGuide();
 
-        [Required]
-        [StringLength(15)]
-        public string ContactNo { get; set; }
+        [Required, MaxLength(100)]
+        public string CompanyName { get; set; }
 
-        [Display(Name = "Created On")]
-        public DateTime? CreatedOn { get; set; }
+        [Required, MaxLength(100)]
+        public string OwnerName { get; set; }
 
-        [StringLength(100)]
-        [DataType(DataType.Password)]
-        public string Password { get; set; }
+        [Required, MaxLength(20)]
+        public string ContactNumber { get; set; }
+
+        [Required, EmailAddress, MaxLength(100)]
+        public string Email { get; set; }
+
+        public int TruckCount { get; set; }
+
+        [MaxLength(200)]
+        public string? TruckTypes { get; set; } // Comma-separated
+
+        [MaxLength(100)]
+        public string? BaseLocation { get; set; }
+
+        [MaxLength(200)]
+        public string? ServiceRegions { get; set; }
+
+        //[MaxLength(200)]
+        public string? TruckImagePath { get; set; } = null;
+
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+        public virtual FcmDeviceToken FcmDeviceToken { get; set; }
 
     }
 }

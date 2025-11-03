@@ -1,4 +1,6 @@
-﻿using Booking.Helper;
+﻿using Booking.Data.Tables;
+using Booking.FCMNotification;
+using Booking.Helper;
 using Booking.Models;
 using Booking.Services;
 using Microsoft.AspNetCore.Authentication;
@@ -13,18 +15,20 @@ namespace Booking.Controllers
     {
         private readonly ILogger<SupplierController> _logger;
         private readonly ISupplierService _supplierService;
-        public SupplierController(ISupplierService supplierService)
+        private readonly IFCMNotification _fCMNotification;
+        public SupplierController(ISupplierService supplierService, IFCMNotification fCMNotification)
         {
             _supplierService = supplierService;
+            _fCMNotification = fCMNotification;
         }
         public async Task<IActionResult> Dashboard(CancellationToken cancellationToken = default)
         {
-            var supplier = SessionHelper.GetObjectFromSession<SupplierModel>(HttpContext.Session, SessionKeys.Supplier.LoggedInSupplierName);
+            var supplier = SessionHelper.GetObjectFromSession<SupplierOnboardingDto>(HttpContext.Session, SessionKeys.Supplier.LoggedInSupplierName);
             if (supplier is null)
             {
                 return RedirectToAction("Index", "Supplier");
             }
-            ViewBag.supplierName = SessionHelper.GetObjectFromSession<SupplierModel>(HttpContext.Session, SessionKeys.Supplier.LoggedInSupplierName).SupplierName ?? null;
+            ViewBag.supplierName = SessionHelper.GetObjectFromSession<SupplierOnboardingDto>(HttpContext.Session, SessionKeys.Supplier.LoggedInSupplierName).OwnerName ?? null;
             ViewBag.IncomingBookingCount = await _supplierService.IncomingBookingCount(supplier.Id, cancellationToken);
             return View();
         }
@@ -43,7 +47,7 @@ namespace Booking.Controllers
                 HttpContext.Session.Set(SessionKeys.Supplier.LoggedInSupplierName, Encoding.UTF8.GetBytes(System.Text.Json.JsonSerializer.Serialize(result)));
                 var claims = new List<Claim>
                         {
-                            new Claim(ClaimTypes.Name, result.Id), // This becomes Identity.Name
+                            new Claim(ClaimTypes.Name, result.Id.ToString()), // Ensure Id is a string
                             new Claim("role", "supplier")
                         };
 
@@ -51,10 +55,33 @@ namespace Booking.Controllers
                 var principal = new ClaimsPrincipal(identity);
                 await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
 
+                FcmDeviceToken fcmDeviceToken = new FcmDeviceToken
+                {
+                    UserId = result.Id,
+                    DeviceToken = await _fCMNotification.GetAccessTokenAsync(),
+                    Platform = GetPlatform()
+                };  
+
+                await _supplierService.AddDeviceTokenAsync(fcmDeviceToken, cancellationToken); 
 
                 return RedirectToAction("Dashboard", "Supplier");
             }
             return RedirectToAction("Index", "Supplier");
+        }
+
+        public string GetPlatform() {
+            var userAgent = HttpContext.Request.Headers["User-Agent"].ToString();
+            var platform = "Web"; // Default to web
+
+            if (userAgent.Contains("Android"))
+            {
+                platform = "Android";
+            }
+            else if (userAgent.Contains("iPhone") || userAgent.Contains("iPad") || userAgent.Contains("iOS"))
+            {
+                platform = "iOS";
+            }
+            return platform;
         }
     }
 }

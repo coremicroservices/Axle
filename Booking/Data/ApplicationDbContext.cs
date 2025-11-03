@@ -8,7 +8,16 @@ namespace Booking.Data
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
+            
+        }
 
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            // EnableDetailedErrors call should be enabled only for debugging.  
+            // It may cause small performance overhead during execution.
+            optionsBuilder.UseSqlServer("Data Source=BOOK-I7UVD976CN;Initial Catalog=axle;Persist Security Info=True;User ID=sa;Password=Pass1234$;Encrypt=True;Trust Server Certificate=True")
+                .LogTo(Console.WriteLine)
+                .EnableDetailedErrors();
         }
 
 
@@ -19,5 +28,7 @@ namespace Booking.Data
         public virtual DbSet<Suppliers> Suppliers { get; set; }
         public virtual DbSet<UserModel> Users { get; set; } 
         public virtual DbSet<BuyerSupplierMapping> BuyerSupplierMappings { get; set; }
+        public virtual DbSet<FcmDeviceToken> FcmDeviceTokens { get; set; }
+        public virtual DbSet<FileItem> FileItems { get; set; }
         }
 }
