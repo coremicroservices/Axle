@@ -1,4 +1,6 @@
-﻿using Booking.Helper;
+﻿using Booking.Data.Tables;
+using Booking.Helper;
+using Booking.Models;
 using Booking.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.Text;
@@ -27,8 +29,47 @@ namespace Booking.Controllers
                 TempData["success"] =   "Login Successful";
                 return RedirectToAction("Index", "Welcome");
             }
+            TempData["error"] = "Login failed — incorrect credentials. Not registered yet? Sign up now and join us!";
             return RedirectToAction("Index", "Welcome");
         }
-       
+
+        [HttpGet]
+        public async Task<IActionResult> Register()
+        {
+            return View();
+        }
+
+
+
+        [HttpPost]
+        public async Task<IActionResult> Register(IFormCollection formcollecion)
+        {
+            string mobileNumber = formcollecion["MobileNumber"];
+            string name = formcollecion["Name"];
+            string email = formcollecion["Email"];
+            string password = formcollecion["Password"];
+
+            if (ModelState.IsValid)
+            {
+                var result = await _authService.RegisterUserAsync(new UserModel
+                {
+                    Name = name,
+                    Email = email,
+                    PasswordHash = password,
+                    Id = GuideHelper.GetGuide(),
+                    CreatedAt = DateTime.UtcNow,
+                    FcmDeviceTokenId = string.Empty,
+                    Contactnumber = mobileNumber
+                });
+                // Success: register contains valid data
+                TempData["register"] = $"Registration successfully Done";
+                return RedirectToAction("Index", "Welcome");
+            }
+
+            // Rehydrate wrapper model for redisplay
+            TempData["error"] = "Oops , Something went wrong";
+            return RedirectToAction("Index", "Welcome");
+        }
+
     }
 }

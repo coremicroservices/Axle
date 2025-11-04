@@ -3,9 +3,12 @@ using Booking.Data.Tables;
 using Booking.Helper;
 using Booking.Models;
 using Booking.Services;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -33,37 +36,33 @@ public class AuthController : Controller
             var result = await _authService.LoginUserAsync(login.Email, login.Password, cancellationToken);
             if (result != null)
             {
+                var claims = new List<Claim>
+        {
+            new Claim(ClaimTypes.Name, result.Name),
+            new Claim(ClaimTypes.Role, "Admin")
+        };
+
+                var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+
+                var authProperties = new AuthenticationProperties
+                {
+                    IsPersistent = true, // for "Remember Me"
+                    ExpiresUtc = DateTimeOffset.UtcNow.AddHours(1)
+                };
+
+                await HttpContext.SignInAsync(
+                    CookieAuthenticationDefaults.AuthenticationScheme,
+                    new ClaimsPrincipal(claimsIdentity),
+                    authProperties
+                );
+
+
                 HttpContext.Session.Set(SessionKeys.User.LoggedInUserDetail, Encoding.GetEncoding("utf-8").GetBytes(System.Text.Json.JsonSerializer.Serialize(result)));
-                 
+
                 return RedirectToAction("Index", "Home");
             }
             return RedirectToAction("Index", "Auth");
         }
         return RedirectToAction("Index", "Auth");
-    }
- 
-
-    [HttpPost]
-    public async Task<IActionResult> Register([Bind(Prefix = "Register")] RegisterViewModel register)
-    {
-        if (ModelState.IsValid)
-        {
-         var result =  await  _authService.RegisterUserAsync(new UserModel
-            {
-                Name = register.Name,
-                Email = register.Email,
-                PasswordHash = register.Password,
-                Id = GuideHelper.GetGuide(),
-                CreatedAt = DateTime.UtcNow
-            });
-            // Success: register contains valid data
-            TempData["register"] = $"Registration successfully Done.. with uniqe Id {result}";
-            return RedirectToAction("Index", "Auth");
-        }
-
-        // Rehydrate wrapper model for redisplay
-        var model = new AuthViewModel { Register = register };
-        return View("LoginRegister", model);
-    }
-
+    }  
 }

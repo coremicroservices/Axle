@@ -1,4 +1,5 @@
 using Axle.Hubs;
+using Booking.Attributes;
 using Booking.Data.Tables;
 using Booking.FCMNotification;
 using Booking.Helper;
@@ -12,6 +13,7 @@ using System.Diagnostics;
 
 namespace Booking.Controllers
 {
+    [MyAuthorize]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
@@ -35,7 +37,8 @@ namespace Booking.Controllers
             _hubContext = hubContext;
             _FCMNotification = FCMNotification;
         }
-
+        
+        [MyAuthorize]
         public async Task<IActionResult> Index(CancellationToken cancellationToken = default)
         {
             TempData[SessionKeys.User.LoggedInUserDetail] = SessionHelper.GetObjectFromSession<UserDto>(HttpContext.Session, SessionKeys.User.LoggedInUserDetail);
@@ -71,8 +74,8 @@ namespace Booking.Controllers
 
            var UserDto = SessionHelper.GetObjectFromSession<UserDto>(HttpContext.Session, SessionKeys.User.LoggedInUserDetail);
 
-            string shipmetId =  await _bookingService.CreateShipmentAsync(model, SelectedSupplierIds  );
-            if(shipmetId is not null)
+            string shipmentId =  await _bookingService.CreateShipmentAsync(model, SelectedSupplierIds  );
+            if(shipmentId is not null)
             {
                 var suppliers = await _bookingService.GetSuppliersAsync();
                 suppliers.ForEach(x =>
@@ -84,7 +87,7 @@ namespace Booking.Controllers
                 {
                     var bookingRequest = new BookingRequest()
                     {
-                        BookingId = shipmetId,
+                        BookingId = shipmentId,
                         CustomerName = "Sharad",
                         DropLocation = $"{model.DestinationAddress} . Pin Code({model.DestinationPincode}) ",
                         PickupLocation = $"{model.SourceAddress} . Pin Code({model.SourcePincode}) ",
@@ -94,7 +97,7 @@ namespace Booking.Controllers
                     await _hubContext.Clients.User(supplierId).SendAsync(SessionKeys.User.SendNotificationToPartner, bookingRequest);
                     // await _bookingService.LinkShipmentToSupplierAsync(model.ShipmentId, int.Parse(supplierId));
                     if (keyValuePairs.ContainsKey(supplierId))
-                        await _FCMNotification.SendPushNotification(keyValuePairs[supplierId], "New Shipment Created", $"A new shipment with ID {shipmetId} has been created.");
+                        await _FCMNotification.SendPushNotification(keyValuePairs[supplierId], "New Shipment Created", $"A new shipment with ID {shipmentId} has been created.");
                 });
             }
             else

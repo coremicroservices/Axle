@@ -1,22 +1,31 @@
 using Axle.Hubs;
+using Booking.Attributes;
 using Booking.Data;
-using Booking.Data.Tables;
+using Booking.Handler;
 using Booking.Hubs;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
- 
+
 
 namespace Booking
 {
     public class Program
     {
+       
+
         public static void Main(string[] args)
         {
+           
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
-            builder.Services.AddControllersWithViews();
+            builder.Services.AddControllersWithViews(x =>
+            {
+                x.Filters.Add(typeof(MyAuthorizeAttribute));
+              //  x.Filters.Add(typeof(GlobalErrorHandler));
+            }).AddSessionStateTempDataProvider();
+            builder.Services.AddSession();
             string connetionString = builder.Configuration.GetConnectionString("DefaultConnection");   
             builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connetionString)); 
             builder.Services.AddScoped<Services.IBookingService, Services.BookingService>();
@@ -30,7 +39,7 @@ namespace Booking
             {
                 x.SizeLimit = 1024 * 1024 * 10; // 10 MB
             });
-
+            
             builder.Services.AddSession(options =>
             {
                 options.IdleTimeout = TimeSpan.FromMinutes(30); // Session timeout
@@ -41,8 +50,8 @@ namespace Booking
             builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
-        options.LoginPath = "/Supplier/Login";
-        options.AccessDeniedPath = "/Supplier/AccessDenied";
+                options.LoginPath = "/Welcome/Index";
+                options.AccessDeniedPath = "/Welcome/AccessDenied";
     });
 
 
