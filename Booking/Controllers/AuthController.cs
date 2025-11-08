@@ -1,16 +1,11 @@
-using Booking.Data;
-using Booking.Data.Tables;
 using Booking.Helper;
 using Booking.Models;
 using Booking.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace TruckBookingApp.Api.Controllers;
  
@@ -23,8 +18,8 @@ public class AuthController : Controller
         _authService = authService  ;
     }
     public IActionResult Index()
-    {
-    
+    { 
+
         return View(new AuthViewModel());
     }
 
@@ -33,14 +28,14 @@ public class AuthController : Controller
     {
         if (ModelState.IsValid)
         {
-            var result = await _authService.LoginUserAsync(login.Email, login.Password, cancellationToken);
+            var result = await _authService.LoginUserAsync(login.UserName, login.Password, cancellationToken);
             if (result != null)
             {
-                var claims = new List<Claim>
-        {
-            new Claim(ClaimTypes.Name, result.Name),
-            new Claim(ClaimTypes.Role, "Admin")
-        };
+                        var claims = new List<Claim>
+                {
+                    new Claim(ClaimTypes.Name, result.Name),
+                    new Claim(ClaimTypes.Role, "Admin")
+                };
 
                 var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
 
@@ -56,11 +51,11 @@ public class AuthController : Controller
                     authProperties
                 );
 
-
                 HttpContext.Session.Set(SessionKeys.User.LoggedInUserDetail, Encoding.GetEncoding("utf-8").GetBytes(System.Text.Json.JsonSerializer.Serialize(result)));
-
-                return RedirectToAction("Index", "Home");
+                TempData["success"] = "Success";
+                return RedirectToAction("Index", "Welcome");
             }
+            TempData["error"] = "Invalid username or password";
             return RedirectToAction("Index", "Auth");
         }
         return RedirectToAction("Index", "Auth");

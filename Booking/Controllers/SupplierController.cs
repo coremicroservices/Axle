@@ -66,6 +66,7 @@ namespace Booking.Controllers
 
                 return RedirectToAction("Dashboard", "Supplier");
             }
+            TempData["error"] = "Invalid username or password, If new pls register your self ";
             return RedirectToAction("Index", "Supplier");
         }
 

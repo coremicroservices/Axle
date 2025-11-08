@@ -1,126 +1,146 @@
-﻿@using Booking.Helper
-@{
+﻿@{
     Layout = "~/Views/Shared/_Layout.cshtml";
-    ViewData["Title"] = "Welcome";
+    ViewData["Title"] = "TruckBook - Logistics Made Simple";
 }
+
+ 
+
 <script>
     $(document).ready(function () {
         $('#showRegister').click(function (e) {
             e.preventDefault();
-            $('#registerDiv').slideDown(); // or .fadeIn()
-          document.getElementById('isnotlogin').style.display = 'none';
+            $('#registerDiv').slideDown();
+            $('#loginDiv').hide();
         });
- 
     });
-
-   
 </script>
 
-
 <!-- Hero Section -->
-<div class="container my-5">
-     
-
-    <div class="row align-items-center">
-        <!-- Welcome Message -->
-        <div class="col-lg-6 mb-4 mb-lg-0">
-            <h1 class="fw-bold text-primary display-5">Welcome to TruckBook 🚛</h1>
-            <p class="lead text-muted">Your trusted partner for reliable truck bookings and real-time shipment tracking across India.</p>
-            <a href="/Home/Index" class="btn btn-primary btn-lg mt-3">Book a Truck</a>
-            <p class="mt-4 text-muted small">Trusted by 10,000+ customers across Maharashtra. Experience logistics made simple.</p>
-        </div>
-
-        <div id="registerDiv" class="col-lg-6" style="display:none;">
-            @using (Html.BeginForm("Register", "Customer", FormMethod.Post))
-            {
-                <form method="post" action="/Customer/Register">
-                    <div class="form-group">
-                        <label for="Name">Name</label>
-                        <input type="text" name="Name" class="form-control" placeholder="Enter your name" />
-                    </div>
-                    <div class="form-group">
-                        <label for="Email">Email</label>
-                        <input type="email" name="Email" class="form-control" placeholder="Enter email address" />
-                    </div>
-                    <div class="form-group">
-                        <label for="MobileNumber">Mobile Number</label>
-                        <input type="text" name="MobileNumber" class="form-control" placeholder="Enter mobile number" />
-                    </div>
-                 
-                    <div class="form-group">
-                        <label for="Password">Password</label>
-                        <input type="password" name="Password" class="form-control" placeholder="Create a password" />
-                    </div>
-                    <button type="submit" class="btn btn-primary w-100 mt-3">Register</button>
-                </form>
-            }
-        </div>
-
-        <!-- Login Section -->
-        @if (ViewBag.isNotLoggedIn)
-        {
-            <div class="col-lg-6" id="isnotlogin">
-                <div class="card shadow-sm p-4 border-0">
-                <h4 class="mb-4 text-center">🔐 Login to Your Account</h4>
-                <form asp-action="Login" asp-controller="Customer" method="post" novalidate>
-                    @Html.AntiForgeryToken()
-                    <div class="mb-3">
-                        <label for="Username" class="form-label">Username</label>
-                        <input type="text" name="Username" class="form-control" placeholder="Enter your email or contact number" required />
-                    </div>
-                    <div class="mb-3">
-                        <label for="Password" class="form-label">Password</label>
-                        <input type="password" name="Password" class="form-control" placeholder="Enter your password" required />
-                    </div>
-                    <div class="d-grid">
-                        <button type="submit" class="btn btn-success">Login</button>
-                    </div>
-                    
-                        New user? <a href="#" id="showRegister">Register here</a>
-
-                </form>
-            </div>
-            </div>
-        }
-        else
-{
-
+<section class="bg-light py-5">
+    <div class="container">
+        <div class="row align-items-center">
             <div class="col-lg-6">
-                <h4 class="mb-3 text-center">👋 Welcome back, @ViewBag.LoggedInUser!</h4>
-                <p class="text-muted text-center">You're logged in as <strong>@ViewBag.LoggedInUser</strong>. Ready to manage your shipments?</p>
-                <div class="d-grid gap-2 mt-4">
-                    <a href="/Customer/Shipments" class="btn btn-outline-primary">📦 View My Shipments</a>
-                    <a href="/Account/Profile" class="btn btn-outline-secondary">👤 My Profile</a>
-                    <a href="/Account/Logout" class="btn btn-danger">🚪 Logout</a>
-                </div>
+                <h1 class="display-4 fw-bold text-primary">Book Trucks in Minutes 🚛</h1>
+                <p class="lead text-muted">Real-time tracking, verified drivers, and seamless logistics across India.</p>
+                <a href="/Home/Index" class="btn btn-primary btn-lg mt-3">Start Booking</a>
             </div>
-        }
+            <div class="col-lg-6 text-center">
+                <p class="lead text-muted">A truck isn’t just a machine—it’s a promise in motion, carrying dreams, goods, and grit across every mile</p>
+            </div>
+        </div>
     </div>
-</div>
+</section>
+ 
+<!-- Features Section -->
+<section class="bg-white py-5">
+    <div class="container">
+        <h2 class="text-center mb-5">Why Choose TruckBook?</h2>
+        <div class="row g-4">
+            <div class="col-md-4 text-center">
+                <h5>📦 Easy Booking</h5>
+                <p>Choose vehicle type, pickup, and drop-off with our streamlined interface.</p>
+            </div>
+            <div class="col-md-4 text-center">
+                <h5>📍 Real-Time Tracking</h5>
+                <p>Track your shipments live with GPS updates and delivery status.</p>
+            </div>
+            <div class="col-md-4 text-center">
+                <h5>💬 24/7 Support</h5>
+                <p>Our support team is always available. All drivers are verified and insured.</p>
+            </div>
+        </div>
+    </div>
+</section>
 
-<!-- Feature Highlights -->
-<div class="container mt-5">
+<!-- How It Works -->
+<section class="bg-light py-5">
+    <div class="container">
+        <h2 class="text-center mb-5">How It Works</h2>
+        <div class="row text-center">
+            <div class="col-md-3">
+                <h5>1️⃣ Sign Up</h5>
+                <p>Create your account and verify your mobile number.</p>
+            </div>
+            <div class="col-md-3">
+                <h5>2️⃣ Book a Truck</h5>
+                <p>Select pickup/drop-off and vehicle type.</p>
+            </div>
+            <div class="col-md-3">
+                <h5>3️⃣ Track Shipment</h5>
+                <p>Get live updates and ETA via dashboard or SMS.</p>
+            </div>
+            <div class="col-md-3">
+                <h5>4️⃣ Delivery & Feedback</h5>
+                <p>Confirm delivery and rate your experience.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Testimonials -->
+<section class="container py-5">
+    <h2 class="text-center mb-5">What Our Customers Say</h2>
     <div class="row g-4">
         <div class="col-md-4">
-            <div class="card border-0 shadow-sm h-100 text-center p-3">
-                <h5 class="card-title">📦 Easy Booking</h5>
-                <p class="card-text">Book trucks in minutes with our streamlined interface. Choose vehicle type, pickup, and drop-off with ease.</p>
-                <a href="/Home/Index" class="btn btn-outline-primary btn-sm">Start Booking</a>
+            <div class="card p-3 shadow-sm">
+                <p>"TruckBook made our logistics seamless. Real-time tracking is a game changer!"</p>
+                <small class="text-muted">– Rajesh, Pune</small>
             </div>
         </div>
         <div class="col-md-4">
-            <div class="card border-0 shadow-sm h-100 text-center p-3">
-                <h5 class="card-title">📍 Real-Time Tracking</h5>
-                <p class="card-text">Track your shipments live with GPS updates and delivery status. Stay informed every step of the way.</p>
-                <a href="/Customer/Track" class="btn btn-outline-success btn-sm">Track Shipment</a>
+            <div class="card p-3 shadow-sm">
+                <p>"Booking trucks has never been easier. Highly recommended for small businesses."</p>
+                <small class="text-muted">– Meena, Nagpur</small>
             </div>
         </div>
         <div class="col-md-4">
-            <div class="card border-0 shadow-sm h-100 text-center p-3">
-                <h5 class="card-title">💬 Support & Safety</h5>
-                <p class="card-text">Our support team is here 24/7. All drivers are verified and insured for your peace of mind.</p>
-                <a href="/Customer/Support" class="btn btn-outline-secondary btn-sm">Contact Support</a>
+            <div class="card p-3 shadow-sm">
+                <p>"Excellent support and verified drivers. We trust TruckBook for all our shipments."</p>
+                <small class="text-muted">– Arvind, Mumbai</small>
             </div>
         </div>
     </div>
-</div>
+</section>
+
+<!-- Partners -->
+<section class="bg-white py-5">
+    <div class="container text-center">
+        <h2 class="mb-4">Trusted by Leading Brands</h2>
+        <div class="row justify-content-center">
+            <div class="col-3"><img src="/images/partner1.png" class="img-fluid" alt="Partner 1" /></div>
+            <div class="col-3"><img src="/images/partner2.png" class="img-fluid" alt="Partner 2" /></div>
+            <div class="col-3"><img src="/images/partner3.png" class="img-fluid" alt="Partner 3" /></div>
+        </div>
+    </div>
+</section>
+
+<!-- FAQ -->
+<section class="bg-light py-5">
+    <div class="container">
+        <h2 class="text-center mb-5">Frequently Asked Questions</h2>
+        <div class="accordion" id="faqAccordion">
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="faq1">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse1">
+                        How do I book a truck?
+                    </button>
+                </h2>
+                <div id="collapse1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">Sign up, choose pickup/drop-off, select vehicle type, and confirm booking.</div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="faq2">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse2">
+                        Is tracking available for all shipments?
+                    </button>
+                </h2>
+                <div id="collapse2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">Yes, all shipments are tracked via GPS and updates are sent via SMS and dashboard.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!--
