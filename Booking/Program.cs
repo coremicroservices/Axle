@@ -22,8 +22,7 @@ namespace Booking
             // Add services to the container.
             builder.Services.AddControllersWithViews(x =>
             {
-                x.Filters.Add(typeof(MyAuthorizeAttribute));
-              //  x.Filters.Add(typeof(GlobalErrorHandler));
+                
             }).AddSessionStateTempDataProvider();
             builder.Services.AddSession();
             string connetionString = builder.Configuration.GetConnectionString("DefaultConnection");   

@@ -13,8 +13,8 @@ using System.Diagnostics;
 
 namespace Booking.Controllers
 {
-    [MyAuthorize]
-    public class HomeController : Controller
+    
+    public class HomeController : CustomerBaseController
     {
         private readonly ILogger<HomeController> _logger;
         private readonly IBookingService _bookingService;
@@ -38,7 +38,7 @@ namespace Booking.Controllers
             _FCMNotification = FCMNotification;
         }
         
-        [MyAuthorize]
+       
         public async Task<IActionResult> Index(CancellationToken cancellationToken = default)
         {
             TempData[SessionKeys.User.LoggedInUserDetail] = SessionHelper.GetObjectFromSession<UserDto>(HttpContext.Session, SessionKeys.User.LoggedInUserDetail);

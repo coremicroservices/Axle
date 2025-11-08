@@ -12,8 +12,7 @@ namespace Booking.Attributes
             var path = filterContext.HttpContext.Request.Path.Value;
 
             var excludedPaths = new[] {"/", "/Welcome/Index", "/Account/Login" };
-            if (!filterContext.HttpContext.User.Identity.IsAuthenticated &&
-                !excludedPaths.Contains(path, StringComparer.OrdinalIgnoreCase))
+            if (!filterContext.HttpContext.User.Identity.IsAuthenticated)
 
 
             {
@@ -23,9 +22,7 @@ namespace Booking.Attributes
                 if (tempData != null)
                 {
                     tempData["error"] = "You are not authorized to access this resource.";
-    //                filterContext.Result = new RedirectToRouteResult(
-    //    new RouteValueDictionary(new { controller = "Customer", action = "Login" })
-    //);
+                    filterContext.Result = new RedirectToRouteResult(new RouteValueDictionary(new { controller = "Auth", action = "Index" }));
                 }
             }
             Console.WriteLine("Authorization filter executed.");

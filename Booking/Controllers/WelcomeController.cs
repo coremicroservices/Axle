@@ -15,6 +15,7 @@ namespace Booking.Controllers
         {
             _authService = authService;
         }
+
         [AllowAnonymous]
         public IActionResult Index()
         {

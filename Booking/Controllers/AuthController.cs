@@ -1,14 +1,17 @@
+using Booking.Controllers;
 using Booking.Helper;
 using Booking.Models;
 using Booking.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using System.Text;
 
 namespace TruckBookingApp.Api.Controllers;
- 
+
+[AllowAnonymous]
 public class AuthController : Controller
 {
     private readonly ILogger<AuthController> _logger;
@@ -31,6 +34,8 @@ public class AuthController : Controller
             var result = await _authService.LoginUserAsync(login.UserName, login.Password, cancellationToken);
             if (result != null)
             {
+                HttpContext.Session.SetString("userName", result.Name);
+
                         var claims = new List<Claim>
                 {
                     new Claim(ClaimTypes.Name, result.Name),

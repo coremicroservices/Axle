@@ -10,7 +10,7 @@ using System.Text;
 
 namespace Booking.Controllers
 {
-    public class CustomerController : Controller
+    public class CustomerController : CustomerBaseController
     {
         private readonly IAuthService _authService;
         public CustomerController(IAuthService authService)
@@ -99,5 +99,11 @@ namespace Booking.Controllers
             return RedirectToAction("Index", "Welcome");
         }
 
+        public async Task<IActionResult> Logout(CancellationToken cancellationToken = default)
+        {
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            HttpContext.Session.Clear();            
+            return RedirectToAction("Index", "Welcome");
+        }
     }
 }

@@ -31,7 +31,7 @@ namespace Booking.Data.Tables
         public string FcmDeviceTokenId { get; set; }
         
         
-        public string Contactnumber { get; set; }    
+        public string? Contactnumber { get; set; }    
     }
 
     public class UserDto
