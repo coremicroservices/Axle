@@ -45,10 +45,13 @@
         console.log("Booking accepted");
         }
 
-    function rejectBooking() {
-    // Send reject signal via SignalR or AJAX
-    console.log("Booking rejected");
-    }
+        function rejectBooking() {
+            const popupEl = document.getElementById("bookingRequestPopup");
+            const popup = bootstrap.Modal.getInstance(popupEl);
+            if (popup) {
+                popup.hide();
+            }
+        }
 
     </script>
     <script type="module">
@@ -131,17 +134,13 @@
                     <p><strong>Drop:</strong> <span id="popupDropLocation"></span></p>
                     <p><strong>Truck Type:</strong> <span id="popupTruckType"></span></p>
                     <p><strong>Scheduled Time:</strong> <span id="popupScheduledTime"></span></p>
-                    <p>
-                        <strong>Charges:</strong>
-                        <div class="input-group mb-3">
-                            <input type="text" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default">
-                        </div>
-                    </p>
+                    
                 </div>
 
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-danger" onclick="rejectBooking()">Reject</button>
-                    <button type="button" class="btn btn-success" onclick="acceptBooking()">Accept</button>
+                <div class="modal-footer">                   
+                    <a asp-controller="Supplier" asp-action="Bidding" onclick="rejectBooking()" class="btn btn-outline-danger">
+                        Place Bidding Now
+                    </a>
                 </div>
             </div>
         </div>
