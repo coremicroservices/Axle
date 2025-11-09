@@ -29,8 +29,8 @@
                             @using (Html.BeginForm("Login", "Auth", FormMethod.Post))
                             {
                                 <div class="mb-3">
-                                    @Html.LabelFor(m => m.Login.Email)
-                                    @Html.TextBoxFor(m => m.Login.Email, new { @class = "form-control", @type = "email", placeholder = "Email" })
+                                    @Html.LabelFor(m => m.Login.UserName)
+                                    @Html.TextBoxFor(m => m.Login.UserName, new { @class = "form-control", @type = "text", placeholder = "Enter your mobile number / email id" })
                                 </div>
                                 <div class="mb-3">
                                     @Html.LabelFor(m => m.Login.Password)

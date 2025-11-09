@@ -29,6 +29,9 @@ namespace Booking.Data.Tables
        public virtual FcmDeviceToken? FcmDeviceToken { get; set; } 
 
         public string FcmDeviceTokenId { get; set; }
+        
+        
+        public string? Contactnumber { get; set; }    
     }
 
     public class UserDto
