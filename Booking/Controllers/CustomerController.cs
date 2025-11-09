@@ -61,44 +61,7 @@ namespace Booking.Controllers
             return RedirectToAction("Index", "Customer");
         }
 
-        [HttpGet]
-        public async Task<IActionResult> Register()
-        {
-            return View();
-        }
-
-
-
-        [HttpPost]
-        public async Task<IActionResult> Register(IFormCollection formcollecion)
-        {
-            string mobileNumber = formcollecion["MobileNumber"];
-            string name = formcollecion["Name"];
-            string email = formcollecion["Email"];
-            string password = formcollecion["Password"];
-
-            if (ModelState.IsValid)
-            {
-                var result = await _authService.RegisterUserAsync(new UserModel
-                {
-                    Name = name,
-                    Email = email,
-                    PasswordHash = password,
-                    Id = GuideHelper.GetGuide(),
-                    CreatedAt = DateTime.UtcNow,
-                    FcmDeviceTokenId = string.Empty,
-                    Contactnumber = mobileNumber
-                });
-                // Success: register contains valid data
-                TempData["register"] = $"Registration successfully Done";
-                return RedirectToAction("Index", "Welcome");
-            }
-
-            // Rehydrate wrapper model for redisplay
-            TempData["error"] = "Oops , Something went wrong";
-            return RedirectToAction("Index", "Welcome");
-        }
-
+        
         public async Task<IActionResult> Logout(CancellationToken cancellationToken = default)
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);

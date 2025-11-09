@@ -19,10 +19,13 @@ namespace Booking
            
             var builder = WebApplication.CreateBuilder(args);
 
+           
+
+
             // Add services to the container.
-            builder.Services.AddControllersWithViews(x =>
+            builder.Services.AddControllersWithViews(options =>
             {
-                
+                options.Filters.Add(typeof(CustomErrorFilter)); 
             }).AddSessionStateTempDataProvider();
             builder.Services.AddSession();
             string connetionString = builder.Configuration.GetConnectionString("DefaultConnection");   

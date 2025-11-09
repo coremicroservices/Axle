@@ -15,5 +15,9 @@ namespace Booking.Models
         [DataType(DataType.Password)]
         public string Password { get; set; }
 
+        [Required]
+        [DataType(DataType.Password)]
+        public string ContactNumber { get; set; }
+
     }
 }

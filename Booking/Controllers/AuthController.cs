@@ -1,4 +1,4 @@
-using Booking.Controllers;
+using Booking.Data.Tables;
 using Booking.Helper;
 using Booking.Models;
 using Booking.Services;
@@ -64,5 +64,46 @@ public class AuthController : Controller
             return RedirectToAction("Index", "Auth");
         }
         return RedirectToAction("Index", "Auth");
-    }  
+    }
+
+    
+    [HttpGet]
+    public async Task<IActionResult> Register()
+    {
+        return View();
+    }
+
+
+    [HttpPost]
+    public async Task<IActionResult> Register(AuthViewModel authViewModel)
+    {
+        string mobileNumber = authViewModel.Register.ContactNumber;
+        string name = authViewModel.Register.Name;
+        string email = authViewModel.Register.Email;
+        string password = authViewModel.Register.Password;
+
+        var result = await _authService.RegisterUserAsync(new UserModel
+        {
+            Name = name,
+            Email = email,
+            PasswordHash = password,
+            Id = GuideHelper.GetGuide(),
+            CreatedAt = DateTime.UtcNow,
+            FcmDeviceTokenId = string.Empty,
+            Contactnumber = mobileNumber,
+
+        });
+        if (result is not null)
+        {
+            // Success: register contains valid data
+            TempData["register"] = $"Registration successfully Done";
+            return RedirectToAction("Index", "Welcome");
+
+        }
+        else
+        {
+            TempData["error"] = "Registration failed — please try again.";
+            return RedirectToAction("Index", "Auth");
+        }
+    }
 }
