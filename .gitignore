@@ -6,3 +6,5 @@
 *.vs/
 Booking/obj
 Booking/bin
+Booking/obj/Booking.csproj.nuget.dgspec.json
+Booking/obj/project.assets.json
