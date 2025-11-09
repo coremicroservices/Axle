@@ -69,7 +69,7 @@ namespace Booking.Controllers
             if (!ModelState.IsValid)
             {
                 // return view with validation messages
-                return View(model);
+                return View("Index",model);
             }
 
            var UserDto = SessionHelper.GetObjectFromSession<UserDto>(HttpContext.Session, SessionKeys.User.LoggedInUserDetail);
@@ -105,9 +105,7 @@ namespace Booking.Controllers
                 TempData["Error"] = "Error occurred while creating shipment (demo).";
                 return View(model);
             }
-
-      
-
+             
             TempData["success"] = "Shipment created successfully.";
             return RedirectToAction("MyBookings", "Customer");
             //Customer/MyBookings

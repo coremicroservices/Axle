@@ -46,15 +46,19 @@
                             {
                                 <div class="mb-3">
                                     @Html.LabelFor(m => m.Register.Name)
-                                    @Html.TextBoxFor(m => m.Register.Name, new { @class = "form-control", placeholder = "Full Name" })
+                                    @Html.TextBoxFor(m => m.Register.Name, new { @class = "form-control", placeholder = "Full Name", required = "required" })
                                 </div>
                                 <div class="mb-3">
                                     @Html.LabelFor(m => m.Register.Email)
-                                    @Html.TextBoxFor(m => m.Register.Email, new { @class = "form-control", @type = "email", placeholder = "Email" })
+                                    @Html.TextBoxFor(m => m.Register.Email, new { @class = "form-control", @type = "email", placeholder = "Email", required = "required" })
                                 </div>
                                 <div class="mb-3">
                                     @Html.LabelFor(m => m.Register.Password)
-                                    @Html.PasswordFor(m => m.Register.Password, new { @class = "form-control", placeholder = "Password" })
+                                    @Html.PasswordFor(m => m.Register.Password, new { @class = "form-control", placeholder = "Password", required = "required" })
+                                </div>
+                                <div class="mb-3">
+                                    @Html.LabelFor(m => m.Register.ContactNumber)
+                                    @Html.TextBoxFor(m => m.Register.ContactNumber, new { @class = "form-control", placeholder = "Contact Number", required = "required" })
                                 </div>
                                 <button type="submit" class="btn btn-success w-100">Register</button>
                             }

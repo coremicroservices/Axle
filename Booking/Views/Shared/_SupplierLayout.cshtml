@@ -87,6 +87,33 @@
 </head>
 <body>
 
+    @if (TempData["error"] is not null)
+    {
+
+        <script type="text/javascript">
+            toastr.options = {
+                   "positionClass": "toast-top-center", // Center horizontally at the top
+                   "closeButton": true,
+                   "timeOut": "5000",
+                   "progressBar": true
+               };
+            toastr.error('@TempData["suppplier_error"]');
+        </script>
+    }
+
+
+    @if (TempData["success"] is not null)
+    {
+        <script type="text/javascript">
+             toastr.options = {
+                   "positionClass": "toast-top-center", // Center horizontally at the top
+                   "closeButton": true,
+                   "timeOut": "5000",
+                   "progressBar": true
+               };
+            toastr.success('@TempData["suppplier_success"]');
+        </script>
+    }
     @* Booking NOtification Popup *@
     <!-- Booking Request Popup -->
     <div id="bookingRequestPopup" class="modal fade" tabindex="-1" aria-labelledby="bookingRequestLabel" aria-hidden="true">
