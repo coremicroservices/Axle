@@ -96,7 +96,7 @@ public class AuthController : Controller
         if (result is not null)
         {
             // Success: register contains valid data
-            TempData["register"] = $"Registration successfully Done";
+            TempData["success"] = $"Registration successfully Done";
             return RedirectToAction("Index", "Welcome");
 
         }

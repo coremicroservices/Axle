@@ -18,15 +18,14 @@ namespace Booking
         {
            
             var builder = WebApplication.CreateBuilder(args);
-
-           
-
-
+             
             // Add services to the container.
             builder.Services.AddControllersWithViews(options =>
             {
                 options.Filters.Add(typeof(CustomErrorFilter)); 
             }).AddSessionStateTempDataProvider();
+
+
             builder.Services.AddSession();
             string connetionString = builder.Configuration.GetConnectionString("DefaultConnection");   
             builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connetionString)); 
@@ -37,6 +36,8 @@ namespace Booking
             builder.Services.AddSignalR();
             builder.Services.AddSingleton<IUserIdProvider, CustomUserIdProvider>();
             builder.Services.AddScoped<FCMNotification.IFCMNotification, FCMNotification.FCMNotification>();
+            builder.Services.AddScoped<CustomErrorFilter>();
+
             builder.Services.AddMemoryCache(x =>
             {
                 x.SizeLimit = 1024 * 1024 * 10; // 10 MB

@@ -24,6 +24,12 @@ namespace Booking.Controllers
             return View();
         }
 
+        [HttpGet]
+        public IActionResult MyBookings()
+        {
+            return View();
+        }
+
         [HttpPost]
         public async Task<IActionResult> Login(IFormCollection fc, CancellationToken cancellationToken = default)
         {
