@@ -3,6 +3,8 @@
 *.pxt
 *.uxp
 *.uxt
+*.dll
 .vs
 Booking/bin/
 Booking/obj/
+*.Booking/bin
