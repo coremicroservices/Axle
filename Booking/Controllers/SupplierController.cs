@@ -1,4 +1,5 @@
-﻿using Booking.Data.Tables;
+﻿using Azure;
+using Booking.Data.Tables;
 using Booking.FCMNotification;
 using Booking.Helper;
 using Booking.Models;
@@ -88,13 +89,14 @@ namespace Booking.Controllers
 
         public async Task<IActionResult> IncomoingBookingDetails(CancellationToken cancellationToken = default)
         {
+            List<Shipment> shipments = [];
             var result = HttpContext.Session.GetString(SessionKeys.Supplier.LoggedInSupplierName);
             if (result is not null)
             {
                 var supplier = System.Text.Json.JsonSerializer.Deserialize<SupplierOnboardingDto>(result);
-                var response = await _supplierService.IncomingBookingDetailsAsync(supplier.Id, cancellationToken);
+                shipments = await _supplierService.IncomingBookingDetailsAsync(supplier.Id, cancellationToken);
             }
-            return View();
+            return View(shipments);
         }
 
         public async Task<IActionResult> Bidding()

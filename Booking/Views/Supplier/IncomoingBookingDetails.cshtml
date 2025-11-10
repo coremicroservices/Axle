@@ -1,8 +1,46 @@
-﻿
+﻿@using Booking.Data.Tables
+@model List<Shipment>
 @{
-    ViewData["Title"] = "IncomoingBookingDetails";
+    ViewData["Title"] = "Truck Booking Summary";
     Layout = "~/Views/Shared/_SupplierLayout.cshtml";
 }
 
-<h1>IncomoingBookingDetails</h1>
 
+<div class="container mt-4">
+    <h4 class="mb-3">Truck Booking Summary</h4>
+    <ul class="list-group">
+        @foreach (var item in Model)
+        {
+            <li class="list-group-item shadow-sm mb-3 rounded">
+                <div class="mb-2">
+                    <span class="fw-bold text-secondary">📅 Booking Date:</span>
+                    <span>@item.BookingDate.ToString("dd-MMM-yyyy")</span>
+                </div>
+                <div class="mb-1">
+                    <span class="fw-bold">Source:</span> @item.SourceAddress
+                    <span class="mx-2">→</span>
+                    <span class="fw-bold">Destination:</span> @item.DestinationAddress
+                </div>
+                <div class="mb-1">
+                    <span class="fw-bold">Source Pin Code:</span> @item.SourcePincode
+                    <span class="mx-2">→</span>
+                    <span class="fw-bold">Destination Pin Code:</span> @item.DestinationPincode
+                </div>
+                <div class="mb-1">
+                    <span class="fw-bold">Invoice Number:</span> @item.InvoiceNumber
+                </div>
+                <div class="mb-1">
+                    <span class="fw-bold">Invoice Value:</span> ₹@item.InvoiceValue
+                </div>
+                <div class="mb-3">
+                    <span class="fw-bold">Truck Type:</span> PTL
+                </div>
+                <div>
+                    <label for="proposedPrice" class="form-label fw-bold">💰 Proposed Price:</label>
+                    <input type="text" class="form-control w-50" id="proposedPrice" name="ProposedPrice" placeholder="Enter your price">
+                </div>
+            </li>
+
+        }
+    </ul>
+</div>
