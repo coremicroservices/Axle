@@ -1,4 +1,7 @@
 ﻿using Booking.Helper;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.Identity.Client;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -52,5 +55,31 @@ namespace Booking.Data.Tables
 
         public bool IsActive { get; set; } = true;
         public DateTime BookingDate { get; set; }
+
+        public virtual ICollection<BuyerSupplierMapping> BuyerSupplierMappings { get; set; }
     }
+
+   public class ShipmentConfiguration : IEntityTypeConfiguration<Shipment>
+    {
+        public void Configure(EntityTypeBuilder<Shipment> builder)
+        {
+            builder.HasKey(s => s.Id);
+            builder.Property(s => s.Id).HasMaxLength(32);
+            builder.Property(s => s.fileId).IsRequired().HasMaxLength(32);
+            builder.Property(s => s.SourcePincode).IsRequired().HasMaxLength(6);
+            builder.Property(s => s.SourceAddress).IsRequired().HasMaxLength(1000);
+            builder.Property(s => s.DestinationPincode).IsRequired().HasMaxLength(6);
+            builder.Property(s => s.DestinationAddress).IsRequired().HasMaxLength(1000);
+            builder.Property(s => s.InvoiceNumber).HasMaxLength(100);
+            builder.Property(s => s.InvoiceValue).HasColumnType("decimal(18,2)");
+            builder.Property(s => s.CreatedBy).HasMaxLength(100);
+            builder.Property(s => s.CreatedOn).IsRequired();
+            builder.Property(s => s.IsActive).IsRequired();
+            builder.Property(s => s.BookingDate).IsRequired();
+            builder.HasMany(s => s.BuyerSupplierMappings)
+                   .WithOne()
+                   .HasForeignKey(bsm => bsm.ShipmentId);                   
+        }
+    }   
+
 }

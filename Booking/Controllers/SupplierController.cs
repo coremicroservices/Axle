@@ -29,7 +29,7 @@ namespace Booking.Controllers
                 return RedirectToAction("Index", "Supplier");
             }
             ViewBag.supplierName = SessionHelper.GetObjectFromSession<SupplierOnboardingDto>(HttpContext.Session, SessionKeys.Supplier.LoggedInSupplierName).OwnerName ?? null;
-            ViewBag.IncomingBookingCount = await _supplierService.IncomingBookingCount(supplier.Id, cancellationToken);
+            ViewBag.IncomingBookingCount = await _supplierService.IncomingBookingCountAsync(supplier.Id, cancellationToken);
             return View();
         }
 
@@ -60,9 +60,9 @@ namespace Booking.Controllers
                     UserId = result.Id,
                     DeviceToken = await _fCMNotification.GetAccessTokenAsync(),
                     Platform = GetPlatform()
-                };  
+                };
 
-                await _supplierService.AddDeviceTokenAsync(fcmDeviceToken, cancellationToken); 
+                await _supplierService.AddDeviceTokenAsync(fcmDeviceToken, cancellationToken);
 
                 return RedirectToAction("Dashboard", "Supplier");
             }
@@ -70,7 +70,8 @@ namespace Booking.Controllers
             return RedirectToAction("Index", "Supplier");
         }
 
-        public string GetPlatform() {
+        public string GetPlatform()
+        {
             var userAgent = HttpContext.Request.Headers["User-Agent"].ToString();
             var platform = "Web"; // Default to web
 
@@ -83,6 +84,22 @@ namespace Booking.Controllers
                 platform = "iOS";
             }
             return platform;
+        }
+
+        public async Task<IActionResult> IncomoingBookingDetails(CancellationToken cancellationToken = default)
+        {
+            var result = HttpContext.Session.GetString(SessionKeys.Supplier.LoggedInSupplierName);
+            if (result is not null)
+            {
+                var supplier = System.Text.Json.JsonSerializer.Deserialize<SupplierOnboardingDto>(result);
+                var response = await _supplierService.IncomingBookingDetailsAsync(supplier.Id, cancellationToken);
+            }
+            return View();
+        }
+
+        public async Task<IActionResult> Bidding()
+        {
+            return View();
         }
     }
 }
