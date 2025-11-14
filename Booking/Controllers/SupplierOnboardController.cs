@@ -25,23 +25,14 @@ namespace Booking.Controllers
         [HttpPost]
         public async Task<IActionResult> SubmitOnboarding(SupplierOnboardingDto dto, CancellationToken cancellationToken = default)
         {
+            ModelState.Remove(nameof(dto.Id));
             if (!ModelState.IsValid)
-                return View(dto);
+                return View("Index", dto);
 
-            string imagePath = null;
+            ShipmentFile shipmentFile = null;
             if (dto.TruckImage != null && dto.TruckImage.Length > 0)
             {
-                var fileName = Path.GetFileNameWithoutExtension(dto.TruckImage.FileName);
-                var extension = Path.GetExtension(dto.TruckImage.FileName);
-                var newFileName = $"{fileName}_{Guid.NewGuid()}{extension}";
-                var savePath = Path.Combine("wwwroot/images/trucks", newFileName);
-
-                using (var stream = new FileStream(savePath, FileMode.Create))
-                {
-                    await dto.TruckImage.CopyToAsync(stream);
-                }
-
-                imagePath = $"/images/trucks/{newFileName}";
+                shipmentFile  =  await _uploadFileService.UploadFileAsync(dto.TruckImage, cancellationToken);
             }
 
             var supplier = new Suppliers
@@ -54,13 +45,13 @@ namespace Booking.Controllers
                 TruckTypes = string.Join(",", dto.TruckTypes ?? new List<string>()),
                 BaseLocation = dto.BaseLocation,
                 ServiceRegions = dto.ServiceRegions,
-                TruckImagePath = imagePath,
+                TruckImagePath = shipmentFile.FileId ?? null,
                 Id = GuideHelper.GetGuide()
             };
 
             await _applicationDbContext.AddAsync(supplier, cancellationToken);
             await _applicationDbContext.SaveChangesAsync(cancellationToken);
-
+            TempData["suppplier_success"] = "Registration succesfully Done!!";
             return RedirectToAction("index", "supplier");
         }
     }

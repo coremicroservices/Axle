@@ -30,5 +30,6 @@ namespace Booking.Data
         public virtual DbSet<BuyerSupplierMapping> BuyerSupplierMappings { get; set; }
         public virtual DbSet<FcmDeviceToken> FcmDeviceTokens { get; set; }
         public virtual DbSet<FileItem> FileItems { get; set; }
-        }
+        public virtual DbSet<Biding> Bidings { get; set; }  
+    }
 }

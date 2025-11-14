@@ -8,9 +8,9 @@ namespace Booking.Services
     public interface ISupplierService
     {
         public Task<SupplierOnboardingDto> IsValidSupplierAsync(string contactno, string password, CancellationToken cancellationToken = default);
-        public Task<int> IncomingBookingCount(string supplierId,CancellationToken cancellationToken = default);
-
+        public Task<int> IncomingBookingCountAsync(string supplierId,CancellationToken cancellationToken = default);
         public Task<string> AddDeviceTokenAsync(FcmDeviceToken fcmDeviceToken, CancellationToken cancellationToken = default);
+        public Task<List<Shipment>> IncomingBookingDetailsAsync(string loggedInUserId, CancellationToken cancellationToken = default);
     }
     public class SupplierService : ISupplierService
     {
@@ -20,7 +20,7 @@ namespace Booking.Services
                 _applicationDbContext = applicationDbContex;
         }
 
-        public async Task<int> IncomingBookingCount(string supplierId, CancellationToken cancellationToken = default)
+        public async Task<int> IncomingBookingCountAsync(string supplierId, CancellationToken cancellationToken = default)
         {
             return await _applicationDbContext.BuyerSupplierMappings.CountAsync(x => x.SupplierId.Equals(supplierId), cancellationToken);
         }
@@ -62,5 +62,13 @@ namespace Booking.Services
             await _applicationDbContext.SaveChangesAsync(cancellationToken);
             return fcmDeviceToken.Id;
         }
+
+
+        public async Task<List<Shipment>> IncomingBookingDetailsAsync(string loggedInUserId, CancellationToken cancellationToken = default)            
+        {       
+            var shipmentIds  = await _applicationDbContext.BuyerSupplierMappings.Where(x => x.SupplierId.Equals(loggedInUserId)).Select(x => x.ShipmentId).ToListAsync(cancellationToken);
+            return await _applicationDbContext.Shipments.Where(x => shipmentIds.Contains(x.Id)).AsNoTrackingWithIdentityResolution().ToListAsync(cancellationToken);
+        }
+ 
     }
 }

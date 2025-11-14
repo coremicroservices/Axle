@@ -80,7 +80,7 @@ namespace Booking.Models
         {
             if (value is DateTime date)
             {
-                return date >= DateTime.UtcNow;
+                return date >= DateTime.UtcNow.Date;
             }
             return false;
         }
