@@ -19,12 +19,12 @@ ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 
 # If the Dockerfile is inside Booking/, the project file is at the context root as Booking.csproj
-COPY ["Booking.csproj", "./"]
+COPY ["Booking/Booking.csproj", "./"]
 RUN dotnet restore "./Booking.csproj"
 
 # copy remaining source and publish
 COPY . .
-RUN dotnet publish "./Booking.csproj" -c ${BUILD_CONFIGURATION} -o /app/publish /p:UseAppHost=false
+RUN dotnet publish ".Booking/Booking.csproj" -c ${BUILD_CONFIGURATION} -o /app/publish /p:UseAppHost=false
 
 # Final image
 FROM base AS final
