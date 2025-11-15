@@ -1,4 +1,4 @@
-using Axle.Hubs;
+﻿using Axle.Hubs;
 using Booking.Attributes;
 using Booking.Data;
 using Booking.Handler;
@@ -27,16 +27,19 @@ namespace Booking
 
 
             builder.Services.AddSession();
-            string connetionString = builder.Configuration.GetConnectionString("DefaultConnection");   
+            string connetionString = builder.Configuration.GetConnectionString("DefaultConnection");
+            builder.Services.AddHttpContextAccessor(); // ✅ Add this line
             builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connetionString)); 
             builder.Services.AddScoped<Services.IBookingService, Services.BookingService>();
             builder.Services.AddScoped<Services.IFileService, Services.FileService>();
             builder.Services.AddScoped<Services.IAuthService, Services.AuthService>();
             builder.Services.AddScoped<Services.ISupplierService, Services.SupplierService>();
+            builder.Services.AddScoped<Services.ICustomerService, Services.CustomerService>();  
             builder.Services.AddSignalR();
             builder.Services.AddSingleton<IUserIdProvider, CustomUserIdProvider>();
             builder.Services.AddScoped<FCMNotification.IFCMNotification, FCMNotification.FCMNotification>();
             builder.Services.AddScoped<CustomErrorFilter>();
+            
 
             builder.Services.AddMemoryCache(x =>
             {

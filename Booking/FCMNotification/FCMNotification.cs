@@ -51,7 +51,7 @@ namespace Booking.FCMNotification
             var credential = GoogleCredential.FromFile(keyPath)
                 .CreateScoped("https://www.googleapis.com/auth/firebase.messaging");
 
-            var accessToken = await credential.UnderlyingCredential.GetAccessTokenForRequestAsync();
+            var accessToken = ""; // await credential.UnderlyingCredential.GetAccessTokenForRequestAsync();
             return accessToken;
         }
     }

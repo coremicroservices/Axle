@@ -2,8 +2,8 @@
 using Booking.Data.Tables;
 using Booking.Helper;
 using Booking.Models;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Http;
 
 namespace Booking.Services
 {
@@ -19,20 +19,27 @@ namespace Booking.Services
         private readonly ILogger<BookingService> _logger;
         private readonly ApplicationDbContext _dbContext;
         private readonly IFileService _uploadFileService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public BookingService(ILogger<BookingService> logger, ApplicationDbContext dbContext, IFileService uploadFileService)
+        public BookingService(ILogger<BookingService> logger, ApplicationDbContext dbContext, IFileService uploadFileService, IHttpContextAccessor httpContextAccessor)
         {
             _logger = logger;
             _dbContext = dbContext;
             _uploadFileService = uploadFileService;
+            _httpContextAccessor = httpContextAccessor;
         }
         public async Task<string> CreateShipmentAsync(ShipmentViewModel shipmentViewModel,List<string> supplierIds, CancellationToken cancellationToken = default)
         {
             var uploadedFileDetail = await _uploadFileService.UploadFileAsync(shipmentViewModel.InvoiceFile);
+
+            // Get logged in user from session (may be null)
+            var user = SessionHelper.GetObjectFromSession<UserDto>(_httpContextAccessor.HttpContext?.Session, SessionKeys.User.LoggedInUserDetail);
+
             Shipment shipment = new Shipment
             {
                 Id = GuideHelper.GetGuide(),
-                CreatedBy = "Admin", // This should be dynamic based on logged-in user  
+                // CreatedBy is a string in the Shipment entity; store user Id (or Name) instead of the whole object
+                CreatedBy = user?.Id ?? user?.Name ?? string.Empty,
                 CreatedOn = DateTime.UtcNow,
                 DestinationAddress = shipmentViewModel.DestinationAddress,
                 DestinationPincode = shipmentViewModel.DestinationPincode,
@@ -40,8 +47,7 @@ namespace Booking.Services
                 InvoiceNumber = shipmentViewModel.InvoiceNumber,
                 InvoiceValue = shipmentViewModel.InvoiceValue,
                 IsActive = true,
-                SourceAddress =
-                shipmentViewModel.SourceAddress,
+                SourceAddress = shipmentViewModel.SourceAddress,
                 SourcePincode = shipmentViewModel.SourcePincode,
                 UpdatedOn = DateTime.UtcNow,
                 BookingDate = shipmentViewModel.BookingDate,
@@ -58,7 +64,6 @@ namespace Booking.Services
                 ProductCode = shipmentViewModel.ProductCode,
                 TotalWeight = shipmentViewModel.TotalWeight,
 
-            
             };
 
             foreach (var supplierId in supplierIds)

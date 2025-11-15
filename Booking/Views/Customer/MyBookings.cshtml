@@ -1,70 +1,74 @@
-﻿
+﻿@using Booking.DTO
+@model List<ShipmentDto>
+
 @{
     ViewData["Title"] = "MyBookings";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-
-@{
-    ViewData["Title"] = "My Bookings";
-}
+ 
 
 <div class="text-center my-4">
     <h2 class="fw-bold text-primary">📦 My Bookings</h2>
     <p class="text-muted">Track your truck bookings, view shipment status, and manage upcoming deliveries.</p>
 </div>
 
-<div class="table-responsive">
-    <table class="table table-bordered table-hover align-middle shadow-sm">
-        <thead class="table-dark">
-            <tr>
-                <th scope="col">Booking ID</th>
-                <th scope="col">Truck Type</th>
-                <th scope="col">Pickup</th>
-                <th scope="col">Drop-off</th>
-                <th scope="col">Date</th>
-                <th scope="col">Status</th>
-                <th scope="col">Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>#TRK1023</td>
-                <td>Mini Truck</td>
-                <td>Bhiwandi</td>
-                <td>Pune</td>
-                <td>Oct 10, 2025</td>
-                <td><span class="badge bg-success">Delivered</span></td>
-                <td>
-                    <a href="/Customer/Track/TRK1023" class="btn btn-sm btn-outline-primary">Track</a>
-                    <a href="/Customer/Invoice/TRK1023" class="btn btn-sm btn-outline-secondary">Invoice</a>
-                </td>
-            </tr>
-            <tr>
-                <td>#TRK1045</td>
-                <td>Container</td>
-                <td>Navi Mumbai</td>
-                <td>Ahmedabad</td>
-                <td>Oct 12, 2025</td>
-                <td><span class="badge bg-warning text-dark">In Transit</span></td>
-                <td>
-                    <a href="/Customer/Track/TRK1045" class="btn btn-sm btn-outline-primary">Track</a>
-                    <a href="/Customer/Cancel/TRK1045" class="btn btn-sm btn-outline-danger">Cancel</a>
-                </td>
-            </tr>
-            <tr>
-                <td>#TRK1058</td>
-                <td>Open Truck</td>
-                <td>Thane</td>
-                <td>Surat</td>
-                <td>Oct 14, 2025</td>
-                <td><span class="badge bg-secondary">Scheduled</span></td>
-                <td>
-                    <a href="/Customer/Track/TRK1058" class="btn btn-sm btn-outline-primary">Track</a>
-                    <a href="/Customer/Reschedule/TRK1058" class="btn btn-sm btn-outline-warning">Reschedule</a>
-                </td>
-            </tr>
-        </tbody>
-    </table>
+<div class="container mt-4">
+    
+    @if (Model != null && Model.Any())
+    {
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Booking ID</th>
+                        <th>File ID</th>
+                        <th>Source</th>
+                        <th>Destination</th>
+                        <th>Invoice #</th>
+                        <th>Invoice Value</th>
+                        <th>Created On</th>
+                        <th>Booking Date</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var shipment in Model)
+                    {
+                        <tr>
+                            <td>@shipment.BookingId</td>
+                            <td>@shipment.FileId</td>
+                            <td>
+                                <strong>Pincode:</strong> @shipment.SourcePincode<br />
+                                <strong>Address:</strong> @shipment.SourceAddress
+                            </td>
+                            <td>
+                                <strong>Pincode:</strong> @shipment.DestinationPincode<br />
+                                <strong>Address:</strong> @shipment.DestinationAddress
+                            </td>
+                            <td>@shipment.InvoiceNumber</td>
+                            <td>₹@shipment.InvoiceValue?.ToString("N2")</td>
+                            <td>@shipment.CreatedOn.ToString("dd MMM yyyy HH:mm")</td>
+                            <td>@shipment.BookingDate.ToString("dd MMM yyyy")</td>
+                            <td>
+                                @if (shipment.IsActive)
+                                {
+                                    <span class="badge bg-success">Active</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">Inactive</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-warning">No shipments found.</div>
+    }
 </div>
 
 <div class="text-center mt-4">

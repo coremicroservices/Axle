@@ -1,11 +1,23 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Booking.Data.Tables;
+using Booking.Helper;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using System.Security.Claims;
 
 namespace Booking.Controllers
 {
-    public class CustomerBaseController : Controller
+    public abstract class BaseClassForSession 
     {
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        protected BaseClassForSession(IHttpContextAccessor httpContextAccessor)
+        {
+            _httpContextAccessor = httpContextAccessor;
+        }
+       protected UserDto userDto => SessionHelper.GetObjectFromSession<UserDto>(_httpContextAccessor.HttpContext?.Session, SessionKeys.User.LoggedInUserDetail);
+    }
+    public class CustomerBaseController :  Controller
+    {      
+        protected UserDto userDto => SessionHelper.GetObjectFromSession<UserDto>(HttpContext.Session, SessionKeys.User.LoggedInUserDetail);
         // Optional: override this in derived controllers to skip auth
         protected virtual bool IsPublicPage => false;
 
@@ -26,7 +38,7 @@ namespace Booking.Controllers
 
             var user = context.HttpContext.User;
 
-            if (!user.Identity.IsAuthenticated)
+            if (userDto is null)
             {
                 // Prevent redirect loop
                 if (!path.Contains("/Auth/Index", StringComparison.OrdinalIgnoreCase))

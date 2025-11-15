@@ -14,6 +14,8 @@ namespace Booking.Data.Tables
         [StringLength(32)]
         public string Id { get; set; } = GuideHelper.GetGuide();
 
+        public string BookingId { get; set; } = GenerateTruckBookingCode();
+
         [Required]
         [StringLength(32)]
         public string fileId { get; set; } 
@@ -56,10 +58,18 @@ namespace Booking.Data.Tables
         public bool IsActive { get; set; } = true;
         public DateTime BookingDate { get; set; }
 
-        public virtual ICollection<BuyerSupplierMapping> BuyerSupplierMappings { get; set; }
+        public virtual ICollection<BuyerSupplierMapping> BuyerSupplierMappings { get; set; } = new List<BuyerSupplierMapping>();
+
+        public static string GenerateTruckBookingCode()
+        {
+            string prefix = "AXLE";        
+            string randomPart = Guid.NewGuid().ToString("N").Substring(0, 10).ToUpper(); // 3-char random
+            return $"{prefix}-{DateTime.UtcNow.Ticks}-{randomPart}";
+        }
+
     }
 
-   public class ShipmentConfiguration : IEntityTypeConfiguration<Shipment>
+    public class ShipmentConfiguration : IEntityTypeConfiguration<Shipment>
     {
         public void Configure(EntityTypeBuilder<Shipment> builder)
         {
@@ -78,7 +88,7 @@ namespace Booking.Data.Tables
             builder.Property(s => s.BookingDate).IsRequired();
             builder.HasMany(s => s.BuyerSupplierMappings)
                    .WithOne()
-                   .HasForeignKey(bsm => bsm.ShipmentId);                   
+                   .HasForeignKey(bsm => bsm.ShipmentId);                
         }
     }   
 
