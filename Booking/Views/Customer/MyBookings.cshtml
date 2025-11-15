@@ -21,7 +21,7 @@
                 <thead class="table-dark">
                     <tr>
                         <th>Booking ID</th>
-                        <th>File ID</th>
+                        <th>Attachment</th>
                         <th>Source</th>
                         <th>Destination</th>
                         <th>Invoice #</th>
@@ -36,7 +36,15 @@
                     {
                         <tr>
                             <td>@shipment.BookingId</td>
-                            <td>@shipment.FileId</td>
+                            <td>
+                                @* @shipment.ShipmentFileId *@
+
+                                <a href="/customer/DownloadFile/@(shipment.ShipmentFile.fileItemId)" class="btn btn-primary" download>
+                                    <i class="bi bi-download"></i> Download
+                                </a>
+
+
+                            </td>
                             <td>
                                 <strong>Pincode:</strong> @shipment.SourcePincode<br />
                                 <strong>Address:</strong> @shipment.SourceAddress

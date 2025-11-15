@@ -11,7 +11,7 @@ namespace Booking.Data.Tables
     {
         [Key]
         [StringLength(32)]
-        public string FileId { get; set; } = GuideHelper.GetGuide();
+        public string Id { get; set; } = GuideHelper.GetGuide();
 
          
         [Required]
@@ -45,6 +45,8 @@ namespace Booking.Data.Tables
         public string fileItemId { get; set; }
 
         public virtual FileItem FileItem { get; set; }
+
+        public virtual Shipment Shipment { get; set; }
     }
     public class ShipmentFileConfiguration : IEntityTypeConfiguration<ShipmentFile>
     {
@@ -52,7 +54,7 @@ namespace Booking.Data.Tables
         {
             builder.HasOne(s => s.FileItem)
                    .WithOne(f => f.ShipmentFile)
-                   .HasForeignKey<ShipmentFile>(s => s.FileId);
+                   .HasForeignKey<ShipmentFile>(s => s.Id);
         }
     }   
 }

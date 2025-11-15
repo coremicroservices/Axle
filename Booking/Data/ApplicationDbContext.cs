@@ -15,7 +15,7 @@ namespace Booking.Data
         {
             // EnableDetailedErrors call should be enabled only for debugging.  
             // It may cause small performance overhead during execution.
-            optionsBuilder.UseSqlServer("Data Source=BOOK-I7UVD976CN;Initial Catalog=axle;Persist Security Info=True;User ID=sa;Password=Pass1234$;Trust Server Certificate=True")
+            optionsBuilder.UseSqlServer("Data Source=DESKTOP-0ROG1KC\\DEVELOPER;Initial Catalog=axle;Persist Security Info=True;User ID=sa;Password=Pass1234$;Trust Server Certificate=True")
                 .LogTo(Console.WriteLine)
                 .EnableDetailedErrors();
         }

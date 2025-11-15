@@ -18,7 +18,7 @@ namespace Booking.Data.Tables
 
         [Required]
         [StringLength(32)]
-        public string fileId { get; set; } 
+        public string ShipmentFileId { get; set; }
         // Source details
         [Required]
         [StringLength(6)]
@@ -58,7 +58,7 @@ namespace Booking.Data.Tables
         public bool IsActive { get; set; } = true;
         public DateTime BookingDate { get; set; }
 
-        public virtual ICollection<BuyerSupplierMapping> BuyerSupplierMappings { get; set; } = new List<BuyerSupplierMapping>();
+        public virtual ICollection<BuyerSupplierMapping> BuyerSupplierMappings { get; set; } = [];
 
         public static string GenerateTruckBookingCode()
         {
@@ -67,6 +67,7 @@ namespace Booking.Data.Tables
             return $"{prefix}-{DateTime.UtcNow.Ticks}-{randomPart}";
         }
 
+        public virtual ShipmentFile ShipmentFile { get; set; }
     }
 
     public class ShipmentConfiguration : IEntityTypeConfiguration<Shipment>
@@ -75,7 +76,7 @@ namespace Booking.Data.Tables
         {
             builder.HasKey(s => s.Id);
             builder.Property(s => s.Id).HasMaxLength(32);
-            builder.Property(s => s.fileId).IsRequired().HasMaxLength(32);
+            builder.Property(s => s.ShipmentFileId).IsRequired().HasMaxLength(32);
             builder.Property(s => s.SourcePincode).IsRequired().HasMaxLength(6);
             builder.Property(s => s.SourceAddress).IsRequired().HasMaxLength(1000);
             builder.Property(s => s.DestinationPincode).IsRequired().HasMaxLength(6);
@@ -88,7 +89,12 @@ namespace Booking.Data.Tables
             builder.Property(s => s.BookingDate).IsRequired();
             builder.HasMany(s => s.BuyerSupplierMappings)
                    .WithOne()
-                   .HasForeignKey(bsm => bsm.ShipmentId);                
+                   .HasForeignKey(bsm => bsm.ShipmentId);      
+            
+            builder.HasOne(s => s.ShipmentFile)
+                   .WithOne(sf => sf.Shipment)
+                   .HasForeignKey<Shipment>(s => s.ShipmentFileId)
+                   .OnDelete(DeleteBehavior.Cascade);   
         }
     }   
 

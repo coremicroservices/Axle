@@ -9,7 +9,7 @@ namespace Booking.Services
 {
     public interface IBookingService
     {
-        public Task<string> CreateShipmentAsync(ShipmentViewModel shipmentViewModel, List<string> supplierIds, CancellationToken cancellationToken = default);
+        public Task<string> CreateShipmentAsync(ShipmentViewModel shipmentViewModel, List<string> supplierIds, string createdBy, CancellationToken cancellationToken = default);
 
         public Task<List<Suppliers>> GetSuppliersAsync(CancellationToken cancellationToken = default);
     }
@@ -28,9 +28,9 @@ namespace Booking.Services
             _uploadFileService = uploadFileService;
             _httpContextAccessor = httpContextAccessor;
         }
-        public async Task<string> CreateShipmentAsync(ShipmentViewModel shipmentViewModel,List<string> supplierIds, CancellationToken cancellationToken = default)
+        public async Task<string> CreateShipmentAsync(ShipmentViewModel shipmentViewModel,List<string> supplierIds,string createdBy, CancellationToken cancellationToken = default)
         {
-            var uploadedFileDetail = await _uploadFileService.UploadFileAsync(shipmentViewModel.InvoiceFile);
+            var uploadedFileDetail = await _uploadFileService.UploadFileAsync(shipmentViewModel.InvoiceFile, createdBy,cancellationToken);
 
             // Get logged in user from session (may be null)
             var user = SessionHelper.GetObjectFromSession<UserDto>(_httpContextAccessor.HttpContext?.Session, SessionKeys.User.LoggedInUserDetail);
@@ -43,7 +43,7 @@ namespace Booking.Services
                 CreatedOn = DateTime.UtcNow,
                 DestinationAddress = shipmentViewModel.DestinationAddress,
                 DestinationPincode = shipmentViewModel.DestinationPincode,
-                fileId = uploadedFileDetail.FileId,
+                ShipmentFileId = uploadedFileDetail.Id,
                 InvoiceNumber = shipmentViewModel.InvoiceNumber,
                 InvoiceValue = shipmentViewModel.InvoiceValue,
                 IsActive = true,

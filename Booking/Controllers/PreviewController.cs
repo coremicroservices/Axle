@@ -14,6 +14,7 @@ namespace Booking.Controllers
         {
             _fileService = fileService;
         }
+
         [HttpGet]
         public async Task<string> GetStringAsync()
         {

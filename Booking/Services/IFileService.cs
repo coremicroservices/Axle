@@ -34,8 +34,10 @@ namespace Booking.Services
     }   
     public interface IFileService
     {
-        public Task<ShipmentFile> UploadFileAsync(IFormFile file, CancellationToken cancellationToken = default);
-        public Task<FileStreamResult> DownloadFileAsync(string fileId, CancellationToken cancellationToken = default);
+        public Task<ShipmentFile> UploadFileAsync(IFormFile file, string createdby, CancellationToken cancellationToken = default);
+        public Task<FileStreamResult> DownloadFileAsync(string nodeId, CancellationToken cancellationToken = default);
+        public Task<bool> DeleteFileAsync(string nodeId, CancellationToken cancellationToken = default);
+        public Task<bool> DeleteFolderAsync(string nodeId, CancellationToken cancellationToken = default);
     }
 
     public record DownloadedFile(Stream stream,string contentType,string fileName);
@@ -106,7 +108,7 @@ namespace Booking.Services
 
         }
 
-        public async Task<ShipmentFile> UploadFileAsync(IFormFile file, CancellationToken cancellationToken = default)
+        public async Task<ShipmentFile> UploadFileAsync(IFormFile file,string createdby, CancellationToken cancellationToken = default)
         {
             if (file == null || file.Length == 0)
             {
@@ -145,7 +147,7 @@ namespace Booking.Services
                     fileitem = new FileItem
                     {
                         Id = GuideHelper.GetGuide(),
-                        CreationDate = DateTimeOffset.UtcNow,
+                        CreationDate = DateTime.UtcNow,
                     
                         Fingerprint = response.Fingerprint,
                  
@@ -177,7 +179,7 @@ namespace Booking.Services
             }
             var fileDetail = new ShipmentFile
             {
-                FileId = GuideHelper.GetGuide(),                    // Unique ID for the file
+                Id = GuideHelper.GetGuide(),                    // Unique ID for the file
                 OriginalFileName = file.FileName,                       // Original file name
                 StoredFileName = $"{GuideHelper.GetGuide()}{Path.GetExtension(file.FileName)}",  // Stored name with GUID
                 FileExtension = Path.GetExtension(file.FileName),     // File extension
@@ -187,12 +189,41 @@ namespace Booking.Services
                 IsActive = true,
                 UploadedOn = DateTime.UtcNow,
                 fileItemId = fileitem?.Id,
-                UploadedBy = "Admin" // You can set this dynamically based on the logged-in user    
+                UploadedBy = createdby // You can set this dynamically based on the logged-in user    
             };
             await _dbContext.AddAsync(fileDetail, cancellationToken);
             return fileDetail; // Return the path where the file is stored
-        } 
+        }
 
-       
+        public async Task<bool> DeleteFileAsync(string nodeId, CancellationToken cancellationToken = default)
+        {
+            await MegaLoginAsync();
+            var nodes = await _megaApiClient.GetNodesAsync();            
+            var node = nodes.FirstOrDefault(n => n.Type == NodeType.File && n.Name == TargetFolderName);
+            if (node is not null)
+            {
+                await _megaApiClient.DeleteAsync(node, true);
+                return true;
+            }
+
+            MegaLogout();
+            return false;             
+        }
+
+        public async Task<bool> DeleteFolderAsync(string nodeId, CancellationToken cancellationToken = default)
+        {
+            await MegaLoginAsync();
+            var nodes = await _megaApiClient.GetNodesAsync();
+            var targetFolder = nodes.FirstOrDefault(n => n.Type == NodeType.Directory && n.Name == TargetFolderName);
+             
+            if (targetFolder is not null)
+            {
+                await _megaApiClient.DeleteAsync(targetFolder, true);
+                return true;
+            }
+
+            MegaLogout();
+            return false;
+        }
     }
 }

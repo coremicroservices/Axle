@@ -18,16 +18,14 @@ namespace Booking.Data.Tables
         [MaxLength(255)]
         public string Name { get; set; }
 
-        public long Size { get; set; }
+        public long Size { get; set; }        
 
-        
-
-        public string Fingerprint { get; set; }
+        public string? Fingerprint { get; set; }
 
         [Required]
         public string ParentId { get; set; }
 
-        public DateTimeOffset CreationDate { get; set; }
+        public DateTime CreationDate { get; set; }
 
         [Required]
         public string Owner { get; set; }
@@ -44,7 +42,7 @@ namespace Booking.Data.Tables
         {
             builder.HasOne(f => f.ShipmentFile)
                    .WithOne(s => s.FileItem)
-                   .HasForeignKey<ShipmentFile>(s => s.FileId);
+                   .HasForeignKey<ShipmentFile>(s => s.Id);
         }
     }   
 }

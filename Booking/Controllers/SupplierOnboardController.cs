@@ -32,7 +32,7 @@ namespace Booking.Controllers
             ShipmentFile shipmentFile = null;
             if (dto.TruckImage != null && dto.TruckImage.Length > 0)
             {
-                shipmentFile  =  await _uploadFileService.UploadFileAsync(dto.TruckImage, cancellationToken);
+                shipmentFile  =  await _uploadFileService.UploadFileAsync(dto.TruckImage,"Onboarding Phase", cancellationToken);
             }
 
             var supplier = new Suppliers
@@ -45,7 +45,7 @@ namespace Booking.Controllers
                 TruckTypes = string.Join(",", dto.TruckTypes ?? new List<string>()),
                 BaseLocation = dto.BaseLocation,
                 ServiceRegions = dto.ServiceRegions,
-                TruckImagePath = shipmentFile.FileId ?? null,
+                TruckImagePath = shipmentFile.Id ?? null,
                 Id = GuideHelper.GetGuide()
             };
 

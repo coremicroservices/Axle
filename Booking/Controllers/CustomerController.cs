@@ -32,6 +32,12 @@ namespace Booking.Controllers
             return View(shipments);
         }
 
+        [HttpGet("/customer/DownloadFile/{fileItemId}")]
+        public async Task<IActionResult> DownloadFile(string fileItemId,CancellationToken cancellationToken = default)
+        {
+            return await _customerService.DownloadFileAsync(fileItemId, cancellationToken);
+        }
+
         //[HttpPost]
         //public async Task<IActionResult> Login(IFormCollection fc, CancellationToken cancellationToken = default)
         //{

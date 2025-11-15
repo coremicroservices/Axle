@@ -62,7 +62,7 @@ namespace Booking.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(ShipmentViewModel model, List<string> SelectedSupplierIds)
+        public async Task<IActionResult> Create(ShipmentViewModel model, List<string> SelectedSupplierIds,CancellationToken cancellationToken = default )
         {
             ViewBag.Products = _products;
 
@@ -74,7 +74,7 @@ namespace Booking.Controllers
 
            var UserDto = SessionHelper.GetObjectFromSession<UserDto>(HttpContext.Session, SessionKeys.User.LoggedInUserDetail);
 
-            string shipmentId =  await _bookingService.CreateShipmentAsync(model, SelectedSupplierIds  );
+            string shipmentId = await _bookingService.CreateShipmentAsync(model, SelectedSupplierIds, UserDto.Id, cancellationToken);
             if(shipmentId is not null)
             {
                 var suppliers = await _bookingService.GetSuppliersAsync();

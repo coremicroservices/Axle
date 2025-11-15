@@ -6,7 +6,7 @@ namespace Booking.DTO
     {
         public string Id { get; set; }
         public string BookingId { get; set; }
-        public string FileId { get; set; }
+        public string ShipmentFileId { get; set; }
 
         // Source details
         public string SourcePincode { get; set; }

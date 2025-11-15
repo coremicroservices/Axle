@@ -47,7 +47,7 @@ public class AuthController : Controller
                 var authProperties = new AuthenticationProperties
                 {
                     IsPersistent = true, // for "Remember Me"
-                    ExpiresUtc = DateTimeOffset.UtcNow.AddHours(1)
+                    ExpiresUtc = DateTime.UtcNow.AddHours(1)
                 };
 
                 await HttpContext.SignInAsync(
