@@ -14,3 +14,10 @@ Booking/obj/Booking.csproj.nuget.g.targets
 Booking/bin/
 Booking/obj/
 *.Booking/bin
+/Booking/bin/Debug/net8.0/appsettings.json
+/Booking/bin/Debug/net8.0/Booking.deps.json
+/Booking/bin/Debug/net8.0/Booking.dll
+/Booking/bin/Debug/net8.0/Booking.exe
+/Booking/bin/Debug/net8.0/Booking.pdb
+/Booking/bin/Debug/net8.0/Booking.staticwebassets.endpoints.json
+/Booking/bin/Debug/net8.0/Booking.staticwebassets.runtime.json
