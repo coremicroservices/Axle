@@ -5,11 +5,16 @@ using Booking.FCMNotification;
 using Booking.Helper;
 using Booking.Hubs;
 using Booking.Models;
+using Booking.MyConfiguration;
 using Booking.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using System.Collections.Concurrent;
 using System.Diagnostics;
+using System.Net;
+using Paytm;
 
 namespace Booking.Controllers
 {
@@ -22,6 +27,8 @@ namespace Booking.Controllers
         private readonly IFCMNotification _FCMNotification;
         private readonly ConcurrentDictionary<string, string> keyValuePairs = [];
 
+        private readonly MyConfigurationSettinggs _myConfigurationSettinggs;
+
         private readonly List<(string Code, string Name)> _products = new()
         {
             ("GEN", "General Cargo"),
@@ -30,12 +37,13 @@ namespace Booking.Controllers
             ("BATT", "Batteries")
         };
 
-        public HomeController(ILogger<HomeController> logger, IBookingService bookingService, IHubContext<ChatHub> hubContext, IFCMNotification FCMNotification)
+        public HomeController(ILogger<HomeController> logger, IBookingService bookingService, IHubContext<ChatHub> hubContext, IFCMNotification FCMNotification,IOptions<MyConfigurationSettinggs> myConfigurationSettinggs)
         {
             _logger = logger;
             _bookingService = bookingService;
             _hubContext = hubContext;
             _FCMNotification = FCMNotification;
+            _myConfigurationSettinggs = myConfigurationSettinggs.Value;
         }
         
        
@@ -105,7 +113,69 @@ namespace Booking.Controllers
                 TempData["Error"] = "Error occurred while creating shipment (demo).";
                 return View(model);
             }
-             
+
+            // Prepare parameters for Paytm Initiate Transaction API
+            Dictionary<string, object> body = new Dictionary<string, object>();
+            Dictionary<string, string> head = new Dictionary<string, string>();
+            Dictionary<string, object> requestBody = new Dictionary<string, object>();
+
+            Dictionary<string, string> txnAmount = new Dictionary<string, string>();
+            txnAmount.Add("value", "1.00");
+            txnAmount.Add("currency", "INR");
+            Dictionary<string, string> userInfo = new Dictionary<string, string>();
+            userInfo.Add("custId", userDto.Id);
+            body.Add("requestType", "Payment");
+            body.Add("mid", _myConfigurationSettinggs.MID);
+            body.Add("websiteName", "https://www.axle.com/");
+            body.Add("orderId", shipmentId);
+            body.Add("txnAmount", txnAmount);
+            body.Add("userInfo", userInfo);
+            body.Add("callbackUrl", "https://<callback URL to be used by merchant>");
+
+
+
+            /*
+            * Generate checksum by parameters we have in body
+            * Find your Merchant Key in your Paytm Dashboard at https://dashboard.paytmpayments.com/next/apikeys 
+            */
+            
+            string paytmChecksum = Checksum.generateSignature(JsonConvert.SerializeObject(body), "YOUR_KEY_HERE");
+
+            head.Add("signature", paytmChecksum);
+
+            requestBody.Add("body", body);
+            requestBody.Add("head", head);
+
+            string post_data = JsonConvert.SerializeObject(requestBody);
+
+            //For  Staging
+            string url = $"https://securestage.paytmpayments.com/theia/api/v1/initiateTransaction?mid={_myConfigurationSettinggs.MID}&orderId={shipmentId}";
+
+            //For  Production 
+            //string  url  =  "https://secure.paytmpayments.com/theia/api/v1/initiateTransaction?mid=YOUR_MID_HERE&orderId=ORDERID_98765";
+
+            HttpWebRequest webRequest = (HttpWebRequest)WebRequest.Create(url);
+
+            webRequest.Method = "POST";
+            webRequest.ContentType = "application/json";
+            webRequest.ContentLength = post_data.Length;
+
+            using (StreamWriter requestWriter = new StreamWriter(webRequest.GetRequestStream()))
+            {
+                requestWriter.Write(post_data);
+            }
+
+            string responseData = string.Empty;
+
+            using (StreamReader responseReader = new StreamReader(webRequest.GetResponse().GetResponseStream()))
+            {
+                responseData = responseReader.ReadToEnd();
+                Console.WriteLine(responseData);
+            }
+
+
+
+
             TempData["success"] = "Shipment created successfully.";
             return RedirectToAction("MyBookings", "Customer");
             //Customer/MyBookings

@@ -3,6 +3,7 @@ using Booking.Attributes;
 using Booking.Data;
 using Booking.Handler;
 using Booking.Hubs;
+using Booking.MyConfiguration;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
@@ -39,7 +40,7 @@ namespace Booking
             builder.Services.AddSingleton<IUserIdProvider, CustomUserIdProvider>();
             builder.Services.AddScoped<FCMNotification.IFCMNotification, FCMNotification.FCMNotification>();
             builder.Services.AddScoped<CustomErrorFilter>();
-            
+            builder.Services.Configure<MyConfigurationSettinggs>(builder.Configuration.GetSection("MyConfiguration"));
 
             builder.Services.AddMemoryCache(x =>
             {
